@@ -35,7 +35,6 @@ class Vision:
     def grab_frame(self):
         # grab the current frame
         frame = self.vs.read()
-        # frame = imutils.resize(frame, width=640)
         
         # resize the frame, blur it, and convert it to the HSV
         # color space

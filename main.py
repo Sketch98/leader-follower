@@ -2,18 +2,17 @@ from vision_controller import VisionController
 from position_system import PositionSystem
 from drive_system import DriveSystem
 import pigpio
-import time
 
 
-screenwidth = (640, 480)
+screenwidth = (320, 240)
 pi = pigpio.pi()
 v = VisionController(screenwidth)
-d = DriveSystem(pi, 26, 13, 6, 5)
-p = PositionSystem(pi, 23, d)
+# d = DriveSystem(pi, 26, 13, 6, 5)
+p = PositionSystem(pi, 18)
 
 
 def vision_callback(x, diameter, sw):
-    p.adjust_servo(x, sw)
+    # p.adjust_servo(x, sw)
     p.queue_camera_data(x, diameter, sw)
 
 
@@ -24,12 +23,10 @@ def vision_callback(x, diameter, sw):
 
 v.set_callback(vision_callback)
 
-time.sleep(3)
-
 try:
     v.loop()
 except KeyboardInterrupt:
     print('im dead')
 finally:
     print('stopping')
-    d.stop()
+    # d.stop()

@@ -1,4 +1,4 @@
 leader-follower
 
-code from mar 18.
-robot following ball for first time
+code from mar 21.
+servo very stable with x-y position of ball 

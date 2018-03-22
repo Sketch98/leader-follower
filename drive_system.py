@@ -1,14 +1,14 @@
 from motor import Motor
 # from rotary_encoder import RotaryEncoder
-# from threading import Thread
+from threading import Thread
 import time
 
 
 class DriveSystem:
-    def __init__(self, pi, left_pwm, left_dir, right_pwm, right_dir):
+    def __init__(self, pi, right_pwm, right_dir, left_pwm, left_dir):
         self.pi = pi
-        self.left_motor = Motor(pi, left_pwm, left_dir, forward=0)
         self.right_motor = Motor(pi, right_pwm, right_dir, forward=1)
+        self.left_motor = Motor(pi, left_pwm, left_dir, forward=0)
         # self.left_encoder = RotaryEncoder(pi, left_a, left_b, left_x)
         # self.right_encoder = RotaryEncoder(pi, right_a, right_b, right_x)
         # self.get_next_target = get_next_target
@@ -17,17 +17,15 @@ class DriveSystem:
     
     def move(self, angle, diameter):
         speed = 0
-        
         if diameter < 50:
-            speed = -0.3
+            speed = 0.3
         elif diameter < 120:
-            speed = -0.2
-        elif diameter < 300:
-            speed = 0.15
+            speed = 0.2
         
         turn_speed = (angle - 90)/90/15
-        left_speed = min(0.25, max(-0.25, (speed+turn_speed)))
         right_speed = min(0.25, max(-0.25, speed-turn_speed))
+        left_speed = min(0.25, max(-0.25, (speed+turn_speed)))
+        # print('right_speed {}   left_speed {}'.format(right_speed,left_speed))
         self.left_motor.set_speed(left_speed)
         self.right_motor.set_speed(right_speed)
 

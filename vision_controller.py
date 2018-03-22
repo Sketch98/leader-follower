@@ -19,9 +19,10 @@ class VisionController:
             x = self.vision.get_x()
             # y = self.vision.get_y()
             diameter = self.vision.get_diameter()
-            self.callback(x, diameter, self.resolution[0])
             
             cur_time = time()
-            if cur_time!= last_time:
+            if cur_time != last_time and x > 0:
                 print('fps {}   x {}   diameter {}'.format(1.0/(cur_time - last_time), x, diameter))
             last_time = cur_time
+
+            self.callback(x, diameter, self.resolution[0])
