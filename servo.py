@@ -1,43 +1,43 @@
-import RPi.GPIO as GPIO
-import time
+import pigpio
+
 
 class Servo:
-    def __init__(self, pin, freq, start):
-        global p
-	GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(pin, GPIO.OUT)
-        p = GPIO.PWM(pin, freq)
-        p.start(((1.0/18.0)*start) + 2.5)
-	p.ChangeDutyCycle(7.5)
-        time.sleep(1)
-
-    def move_servo(self, degree):
-        global p
-	dc = (((1.0/18.0)*degree) + 2.5)
-        p.ChangeDutyCycle(dc)
-        time.sleep(1)
-	#print(dc)
-
-    def cleanGPIO(self):
-	 
-	GPIO.cleanup()	
-
-#p.ChangeDutyCycle(12.5) #180
-
-#time.sleep(1)
-
-#p.ChangeDutyCycle(2.5) #0
-
-#time.sleep(1)
-		
-#p.ChangeDutyCycle(7.5) #90
-
-#time.sleep(1)
+    def __init__(self, pi, pin, left_limit, right_limit, start_angle):
+        self.pi = pi
+        self.pin = pin
+        
+        if right_limit >= left_limit:
+            raise Exception('right_limit >= left_limit')
+        if right_limit > start_angle:
+            raise Exception('right_limit > start_angle')
+        if start_angle > left_limit:
+            raise Exception('start_angle > left_limit')
+        
+        self.left_limit = left_limit
+        self.right_limit = right_limit
+        self.start_angle = start_angle
+        
+        self.pi.set_mode(pin, pigpio.OUTPUT)
+        
+        self.move_to(start_angle)
+    
+    def move_to(self, angle):
+        pulse_width = 500 + 2000 * (angle - self.right_limit) / (self.left_limit - self.right_limit)
+        self.pi.set_servo_pulsewidth(self.pin, pulse_width)
+    
+    def off(self):
+        self.move_to(self.start_angle)
 
 
-
-
-
-	
-
-	
+if __name__ == "__main__":
+    import time
+    
+    pi = pigpio.pi()
+    servo = Servo(pi, 18, 180, 0, 90)
+    time.sleep(1)
+    for a in range(0, 180):
+        servo.move_to(a)
+        time.sleep(0.01)
+    
+    servo.off()
+    pi.stop()

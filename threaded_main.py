@@ -1,12 +1,10 @@
 import vision
 from servo_controller import ServoController
-from motor import Motor
 import pigpio
 import time
+from threading import Thread
 
 pi = pigpio.pi()
-right_motor = Motor(pi, 6, 5)
-left_motor = Motor(pi, 26, 13)
 servo_controller = ServoController(pi, 25, 180, 0, 90, dead_zone=2, safety_factor=0.8)
 tracker = vision.MVision()
 screenwidth = 640.0
@@ -18,7 +16,7 @@ try:
         tracker.grabframe()
         x = tracker.getX()
         if x >= 0:
-            angle = 26.75*(x/screenwidth-0.5)
+            angle = 26.75 * (x / screenwidth - 0.5)
             print('x  = {}    angle = {}'.format(x, angle))
             servo_controller.move_by(angle)
         
@@ -33,11 +31,9 @@ try:
         for t in times:
             avg += t
         avg /= len(times)
-        print(1.0/avg)
+        print(1.0 / avg)
 except KeyboardInterrupt:
     pass
 finally:
-    left_motor.off()
-    right_motor.off()
     servo_controller.off()
     tracker.closeVision()

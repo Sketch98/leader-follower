@@ -1,4 +1,4 @@
 leader-follower
 
-code from mar 15.
-vision working and servo not
+code from mar 16.
+vision and servo working
