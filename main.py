@@ -1,43 +1,35 @@
-import vision
-from servo_controller import ServoController
-from motor import Motor
+from vision_controller import VisionController
+from position_system import PositionSystem
+from drive_system import DriveSystem
 import pigpio
 import time
 
+
+screenwidth = (640, 480)
 pi = pigpio.pi()
-right_motor = Motor(pi, 6, 5)
-left_motor = Motor(pi, 26, 13)
-servo_controller = ServoController(pi, 25, 180, 0, 90, dead_zone=2, safety_factor=0.8)
-tracker = vision.MVision()
-screenwidth = 640.0
+v = VisionController(screenwidth)
+d = DriveSystem(pi, 26, 13, 6, 5)
+p = PositionSystem(pi, 23, d)
+
+
+def vision_callback(x, diameter, sw):
+    p.adjust_servo(x, sw)
+    p.queue_camera_data(x, diameter, sw)
+
+
+# def get_next_target():
+#     if p.has_next_target():
+#         p.next_target()
+
+
+v.set_callback(vision_callback)
+
+time.sleep(3)
 
 try:
-    last_time = time.time()
-    times = [0.1, 0.0, 0.0, 0.0, 0.0]
-    while True:
-        tracker.grabframe()
-        x = tracker.getX()
-        if x >= 0:
-            angle = 26.75*(x/screenwidth-0.5)
-            print('x  = {}    angle = {}'.format(x, angle))
-            servo_controller.move_by(angle)
-        
-        cur_time = time.time()
-        times[4] = times[3]
-        times[3] = times[2]
-        times[2] = times[1]
-        times[1] = times[0]
-        times[0] = cur_time - last_time
-        last_time = cur_time
-        avg = 0.0
-        for t in times:
-            avg += t
-        avg /= len(times)
-        print(1.0/avg)
+    v.loop()
 except KeyboardInterrupt:
-    pass
+    print('im dead')
 finally:
-    left_motor.off()
-    right_motor.off()
-    servo_controller.off()
-    tracker.closeVision()
+    print('stopping')
+    d.stop()

@@ -4,13 +4,12 @@ import pigpio
 class RotaryEncoder:
     """Class to decode mechanical rotary encoder pulses."""
     
-    def __init__(self, pi, gpio_a, gpio_b, gpio_x, callback):
+    def __init__(self, pi, gpio_a, gpio_b, gpio_x):
         
         self.pi = pi
         self.gpio_a = gpio_a
         self.gpio_b = gpio_b
         self.gpio_x = gpio_x
-        self.callback = callback
         
         self.last_gpio = None
         self.last_level = None
@@ -52,14 +51,17 @@ class RotaryEncoder:
                 self.pos += 1
     
     def _report(self, gpio, level, tick):
-        self.callback(self.pos, self.pos - self.last_pos)
+        print("pos={}, dif={}".format(self.pos, self.pos - self.last_pos))
         self.last_pos = self.pos
     
+    def zero(self):
+        self.pos = 0
+    
+    def get_pos(self):
+        return self.pos
+    
     def cancel(self):
-        
-        """
-        Cancel the rotary encoder.
-        """
+        # Cancel the rotary encoder callback
         self.cb_a.cancel()
         self.cb_b.cancel()
         self.cb_x.cancel()
@@ -68,15 +70,9 @@ class RotaryEncoder:
 if __name__ == "__main__":
     import time
     
-    
-    def callback(pos, dif):
-        print("pos={}, dif={}".format(pos, dif))
-    
-    
     pi = pigpio.pi()
-    
-    encoder = RotaryEncoder(pi, 12, 16, 20, callback)
+    encoder = RotaryEncoder(pi, 23, 18, 24)
+    encoder = RotaryEncoder(pi, 17, 27, 22)
     time.sleep(300)
     encoder.cancel()
-    
     pi.stop()

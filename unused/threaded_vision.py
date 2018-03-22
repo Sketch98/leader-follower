@@ -1,24 +1,24 @@
 from numpy import sqrt
 import argparse
-import imutils
 import cv2
 from imutils.video import VideoStream
+from imutils import resize
 import time
+from threading import Thread, Event
 
 
 class Vision:
-    def __init__(self, resolution, min_obj_width):
+    def __init__(self, screenwidth, min_obj_width):
         # define the lower and upper boundaries of the "green"
         # ball in the HSV color space, then initialize the
         # list of tracked points
-        # self.pink_upper = (203, 192, 255)
-        # self.pink_lower = (147, 112, 147)
-        self.pink_upper = (180, 210, 255)
-        self.pink_lower = (160, 100, 120)
-        self.min_obj_width = min_obj_width
+        self.screenwidth = screenwidth
+        self.min_obj_radius = min_obj_width
+        self.pink_upper = (203, 192, 255)
+        self.pink_lower = (147, 112, 147)
+        self.diameter = -1
         self.x = -1
         self.y = -1
-        self.diameter = -1
         
         # construct the argument parse and parse the arguments
         self.ap = argparse.ArgumentParser()
@@ -28,17 +28,42 @@ class Vision:
         args = vars(self.ap.parse_args())
         self.buffer = args["buffer"]
         
-        # initialize the video stream and allow the cammera sensor to warmup
-        self.vs = VideoStream(usePiCamera=args["picamera"] > 0, resolution=resolution).start()
-        time.sleep(2.0)
+        # initialize the video stream and allow the camera sensor to warm up
+        self.vs = VideoStream(usePiCamera=args["picamera"] > 0, resolution=(640, 480), framerate=32).start()
+        time.sleep(2)
+        
+        self.stopped = False
+        self.frame = self.vs.read()
+        self.frame_ready = Event()
+        self.frame_ready.set()
+    
+    def start(self):
+        th = Thread(target=self.update, args=())
+        th.start()
+    
+    def update(self):
+        while True:
+            if self.stopped:
+                return
+            self.frame = self.vs.read()
+            self.frame_ready.set()
+            print(time.time())
+    
+    def stop(self):
+        self.stopped = True
+    
+    def read(self):
+        return self.frame
     
     def grab_frame(self):
         # grab the current frame
-        frame = self.vs.read()
-        # frame = imutils.resize(frame, width=640)
+        self.frame_ready.wait()
+        self.frame_ready.clear()
+        print(time.time())
+        frame = self.read()
+        #frame = resize(frame, width=self.screenwidth)
         
-        # resize the frame, blur it, and convert it to the HSV
-        # color space
+        # resize the frame, blur it, and convert it to the HSV color space
         # blurred = cv2.GaussianBlur(frame, (11, 11), 0)
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         
@@ -62,10 +87,10 @@ class Vision:
             c = max(contours, key=cv2.contourArea)
             ((x, y), radius) = cv2.minEnclosingCircle(c)
             m = cv2.moments(c)
-            center = (int(m["m10"] / (m["m00"] + 0.0000001)), int(m["m01"] / (m["m00"] + 0.0000001)))
+            center = (int(m["m10"] / m["m00"]), int(m["m01"] / m["m00"]))
             
             # only proceed if the radius meets a minimum size
-            if radius >= self.min_obj_width:
+            if radius >= self.min_obj_radius:
                 # draw the circle and centroid on the frame,
                 # then update the list of tracked points
                 cv2.circle(frame, (int(x), int(y)), int(radius),
@@ -78,8 +103,6 @@ class Vision:
             self.diameter = -1
             self.x = -1
             self.y = -1
-        # cv2.imshow("Frame", frame)
-        # cv2.waitKey(1)
     
     def get_diameter(self):
         return self.diameter
@@ -89,6 +112,4 @@ class Vision:
     
     def get_y(self):
         return self.y
-    
-    def stop(self):
-        self.vs.stop()
+
