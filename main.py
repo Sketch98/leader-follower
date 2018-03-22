@@ -1,19 +1,27 @@
 from vision_controller import VisionController
 from position_system import PositionSystem
-from drive_system import DriveSystem
+# from drive_system import DriveSystem
 import pigpio
 
 
+# all distances in mm and angles in radians
+pink = ((160, 100, 120), (180, 210, 255))
 screenwidth = (320, 240)
+frame_rate = 20
+left_pins = {'pwm': 6, 'dir': 5, 'a': 0, 'b': 0}
+right_pins = {'pwm': 26, 'dir': 13, 'a': 0, 'b': 0}
+# TODO: tune this
+motor_pid_constants = {'kp': 0.0, 'ki': 0.0, 'kd': 0.0}
 pi = pigpio.pi()
-v = VisionController(screenwidth)
-# d = DriveSystem(pi, 26, 13, 6, 5)
-p = PositionSystem(pi, 18)
+v = VisionController(pink, screenwidth)
+# d = DriveSystem(pi, left_pins, right_pins, motor_pid_constants)
+p = PositionSystem(pi, 18, frame_rate)
 
 
 def vision_callback(x, diameter, sw):
-    # p.adjust_servo(x, sw)
-    p.queue_camera_data(x, diameter, sw)
+    ball_angle = p.find_ball_pos(x, diameter, sw)
+    if ball_angle is not None:
+        p.adjust_servo(ball_angle)
 
 
 # def get_next_target():

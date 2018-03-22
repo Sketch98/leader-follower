@@ -3,9 +3,10 @@ from time import time
 
 
 class VisionController:
-    def __init__(self, resolution):
+    # instantiates the vision system and handles outputting the relevant data
+    def __init__(self, pink, resolution):
         self.resolution = resolution
-        self.vision = Vision(resolution, 10)
+        self.vision = Vision(pink, resolution, 10)
         self.callback = None
     
     def set_callback(self, callback):
@@ -15,10 +16,8 @@ class VisionController:
         assert self.callback is not None, 'must have callback function before starting vision loop'
         last_time = time()
         while True:
-            self.vision.grab_frame()
-            x = self.vision.get_x()
-            # y = self.vision.get_y()
-            diameter = self.vision.get_diameter()
+            # not using the y position of the ball in frame currently
+            x, _, diameter = self.vision.analyze_frame()
             
             cur_time = time()
             if cur_time != last_time and x > 0:

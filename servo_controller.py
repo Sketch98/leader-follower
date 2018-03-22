@@ -1,9 +1,24 @@
 from servo import Servo
+import math
+
+
+def limit(val, lower_limit, upper_limit):
+    # stops val from exceeding set limits
+    if val < lower_limit:
+        return lower_limit
+    elif val > upper_limit:
+        return upper_limit
+    return val
 
 
 class ServoController:
-    def __init__(self, pi, pin, left_limit=180, right_limit=0, start_angle=90, dead_zone=1, servo_speed=1.14, frame_rate=15, safety_factor=0.95):
-        self.servo = Servo(pi, pin, left_limit, right_limit, start_angle)
+    """
+    handles the non-hardware parts of controlling a servo which are relative movements
+    and not allowing it to move beyond a certain distance per movement
+    """
+    def __init__(self, pi, pin, left_limit=-math.pi / 2, right_limit=math.pi / 2, start_angle=0, dead_zone=0,
+                 servo_speed=1.14, frame_rate=35, safety_factor=0.95):
+        self.servo = Servo(pi, pin, right_limit, left_limit, start_angle)
         self.left_limit = left_limit
         self.right_limit = right_limit
         self.cur_angle = start_angle
@@ -11,41 +26,24 @@ class ServoController:
         self.last_seen = start_angle
         
         # the max angle that the servo can move by in 1 frame
-        self.max_move = 360.0 * safety_factor / servo_speed / frame_rate
+        self.max_move = 2 * math.pi * safety_factor / servo_speed / frame_rate
     
     def get_angle(self):
         return self.cur_angle
     
-    def move_to_last_seen(self):
-        self.move_by(-self.last_seen + self.cur_angle, seen=False)
-    
-    def limit(self, offset):
-        # ensure servo doesn't move beyond limits
-        angle_dest = self.cur_angle + offset
-        if angle_dest > self.left_limit:
-            angle_dest = self.left_limit
-        elif angle_dest < self.right_limit:
-            angle_dest = self.right_limit
-        return angle_dest
-    
-    def move_by(self, offset, seen=True):
+    def move_by(self, offset):
         # don't move inside dead_zone
         if abs(offset) < self.dead_zone:
             offset = 0
         
-        if seen:
-            self.last_seen = self.limit(offset)
-        
         # ensure that servo moves at most by max_move
-        if offset > self.max_move:
-            offset = self.max_move
-        elif offset < -self.max_move:
-            offset = -self.max_move
+        limit(offset, -self.max_move, self.max_move)
+
+        # ensure servo doesn't move beyond limits
+        angle_dst = limit(self.cur_angle + offset, self.left_limit, self.right_limit)
         
-        angle_dest = self.limit(offset)
-        
-        self.cur_angle = angle_dest
-        self.servo.move_to(angle_dest)
+        self.cur_angle = angle_dst
+        self.servo.move_to(angle_dst)
     
     def stop(self):
-        self.servo.off()
+        self.servo.stop()

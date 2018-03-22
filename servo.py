@@ -2,6 +2,9 @@ import pigpio
 
 
 class Servo:
+    """
+    implements the hardware parts of controlling a servo (converting angle to pwm)
+    """
     def __init__(self, pi, pin, left_limit, right_limit, start_angle):
         self.pi = pi
         self.pin = pin
@@ -25,7 +28,7 @@ class Servo:
         pulse_width = 500 + 2000 * (angle - self.right_limit) / (self.left_limit - self.right_limit)
         self.pi.set_servo_pulsewidth(self.pin, pulse_width)
     
-    def off(self):
+    def stop(self):
         self.move_to(self.start_angle)
 
 
@@ -39,5 +42,5 @@ if __name__ == "__main__":
         servo.move_to(a)
         time.sleep(0.01)
     
-    servo.off()
+    servo.stop()
     pi.stop()

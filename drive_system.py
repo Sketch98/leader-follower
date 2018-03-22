@@ -1,60 +1,95 @@
-from motor import Motor
-# from rotary_encoder import RotaryEncoder
-from threading import Thread
-import time
+from motor_controller import MotorController
+from mcp3008 import MCP3008
+from threading import Timer
+import math
+
+
+# ratio of encoder edges to distance in mm
+wheel_diameter = 106.0
+encoder_edges_per_rev = 192
+distance_coefficient = wheel_diameter*math.pi/encoder_edges_per_rev
+distance_between_wheels = 450.0
 
 
 class DriveSystem:
-    def __init__(self, pi, right_pwm, right_dir, left_pwm, left_dir):
+    """
+    controls the motors so that the robot navigates from one target to the next
+    """
+    def __init__(self, pi, left_pins, right_pins, motor_pid_constants, interval=0.01):
         self.pi = pi
-        self.right_motor = Motor(pi, right_pwm, right_dir, forward=1)
-        self.left_motor = Motor(pi, left_pwm, left_dir, forward=0)
-        # self.left_encoder = RotaryEncoder(pi, left_a, left_b, left_x)
-        # self.right_encoder = RotaryEncoder(pi, right_a, right_b, right_x)
-        # self.get_next_target = get_next_target
-        # self.callback = None
-        # self.stopped = False
-    
-    def move(self, angle, diameter):
-        speed = 0
-        if diameter < 50:
-            speed = 0.3
-        elif diameter < 120:
-            speed = 0.2
+        mcp = MCP3008()
+        left_channel = 0
+        right_channel = 1
+        self.left_motor_controller = \
+            MotorController(pi, mcp, left_channel, left_pins, motor_pid_constants, forward=1, interval=interval)
+        self.right_motor_controller = \
+            MotorController(pi, mcp, right_channel, right_pins, motor_pid_constants, forward=1, interval=interval)
+        self.timer = Timer(interval, self.timer_callback)
+        self.count = 0
+        self.interval = interval
         
-        turn_speed = (angle - 90)/90/15
-        right_speed = min(0.25, max(-0.25, speed-turn_speed))
-        left_speed = min(0.25, max(-0.25, (speed+turn_speed)))
-        # print('right_speed {}   left_speed {}'.format(right_speed,left_speed))
-        self.left_motor.set_speed(left_speed)
-        self.right_motor.set_speed(right_speed)
-
+        self.cur_x = 0.0
+        self.cur_y = 0.0
+        self.cur_theta = 0.0
+        self.target_x = 0.0
+        self.target_y = 0.0
+        # self.target_theta = 0.0
+        self.grab = None
+    
+    def start(self):
+        self.timer.start()
+    
     def stop(self):
-        self.left_motor.stop()
-        self.right_motor.stop()
+        self.left_motor_controller.stop()
+        self.right_motor_controller.stop()
+        self.timer.cancel()
     
-    # def set_callback(self, callback):
-    #     self.callback = callback
+    def set_grab(self, grab):
+        self.grab = grab
     
-    # def start(self):
-    #     th = Thread(target=self.loop, args=())
-    #     th.daemon = True
-    #     th.start()
-    #
-    # def stop(self):
-    #     self.stopped = True
-    #     self.left_motor.stop()
-    #     self.right_motor.stop()
+    def timer_callback(self):
+        left_pos_dif = self.left_motor_controller.get_pos_dif() * distance_coefficient
+        right_pos_dif = self.right_motor_controller.get_pos_dif() * distance_coefficient
+        left_target_vel, right_target_vel = self.do_nav_shit(left_pos_dif, right_pos_dif)
+        left_vel = left_pos_dif/self.interval
+        right_vel = right_pos_dif/self.interval
+        self.left_motor_controller.do_mo_shit(left_target_vel, left_vel)
+        self.right_motor_controller.do_mo_shit(left_target_vel, right_vel)
+        self.count += 1
+        if self.count >= 10:
+            self.count = 0
+            # TODO: the motor should temporarily stop while the current lowers instead of shutting off permanently
+            if self.left_motor_controller.check_current():
+                self.left_motor_controller.stop()
+                raise Exception('left motor current trip')
+            if self.right_motor_controller.check_current():
+                self.right_motor_controller.stop()
+                raise Exception('right motor current trip')
     
-    # def loop(self):
-    #     # assert self.callback is not None, 'must have callback function before starting vision loop'
-    #     angle = 90
-    #     diameter = 50
-    #     while not self.stopped:
-    #         if diameter < 25:
-    #             self.left_motor.set_speed(0.2)
-    #         if diameter < 50:
-    #             self.left_motor.set_speed(0.15)
-    #         # self.left_motor.set_speed(0.15)
-    #         # self.right_motor.set_speed(-0.115)
-    #         time.sleep(1)
+    def dead_reckon(self, left_pos_dif, right_pos_dif):
+        """
+        estimates the movement of the robot based on the encoder movements
+        """
+        if left_pos_dif == right_pos_dif:
+            if left_pos_dif != 0.0:
+                self.cur_x += left_pos_dif * math.sin(self.theta)
+                self.cur_y += left_pos_dif * math.cos(self.theta)
+            return
+        r3 = distance_between_wheels/2
+        if right_pos_dif != 0:
+            r3 += distance_between_wheels/(left_pos_dif/right_pos_dif - 1)
+        theta = (left_pos_dif - right_pos_dif)/2.0/math.pi/distance_between_wheels
+        delta_x = r3 - math.cos(theta)
+        delta_y = math.sin(theta)
+        self.cur_x += delta_x*math.cos(self.theta) + delta_y*math.sin(self.theta)
+        self.cur_y += delta_y*math.cos(self.theta) - delta_y*math.sin(self.theta)
+        self.cur_theta += theta
+    
+    def do_nav_stuff(self, left_pos_dif, right_pos_dif):
+        # TODO: obviously
+        print('IGNORE ME!')
+        print(self.count)
+        return 0.0, 0.0
+    
+    def grab_next_target(self):
+        self.target_x, self.target_y = self.grab()
