@@ -1,29 +1,29 @@
-from motor import Motor
-from rotary_encoder import RotaryEncoder
-from pid import PID
 from current_sensor import CurrentSensor
+from motor import Motor
+from pid import PIController
+from rotary_encoder import RotaryEncoder
 
 
 class MotorController:
-    def __init__(self, pi, mcp, channel, pins, pid_constants, pwm_range=255, forward=1, interval=0.01):
+    def __init__(self, pi, mcp, channel, pins, pi_constants, forward=1):
         self.current_sensor = CurrentSensor(mcp, channel)
-        self.motor = Motor(pi, pins['pwm'], pins['dir'], pwm_range=pwm_range, forward=forward)
+        self.motor = Motor(pi, pins['pwm'], pins['dir'], forward=forward)
         self.encoder = RotaryEncoder(pi, pins['a'], pins['b'])
-        self.pid = PID(pid_constants['kp'], pid_constants['ki'], pid_constants['kd'])
-        self.interval = interval
+        self.pid = PIController(pi_constants['kp'], pi_constants['ki'])
     
-    def do_mo_shit(self, target_vel, vel):
-        error = target_vel - vel
-        # TODO: name that
-        name_this = self.pid.calc(error)
-        self.motor.set_speed(name_this)
+    def adjust_motor_speed(self, target_vel, vel, max_edges_per_second):
+        error = (target_vel - vel) / max_edges_per_second
+        self.motor.set_speed(min(1.0, max(-1.0, self.pid.calc(error))))
     
     def stop(self):
         self.motor.stop()
         self.encoder.stop()
     
     def check_current(self):
-        return self.current_sensor.check_current()
+        # TODO: the motor should temporarily stop while the current lowers instead of shutting off permanently
+        if self.current_sensor.check_current():
+            self.motor.stop()
+            raise Exception('motor current trip')
     
     def get_pos_dif(self):
         return self.encoder.get_pos_dif()

@@ -1,5 +1,6 @@
-from servo import Servo
 import math
+
+from servo import Servo
 
 
 def limit(val, lower_limit, upper_limit):
@@ -16,6 +17,7 @@ class ServoController:
     handles the non-hardware parts of controlling a servo which are relative movements
     and not allowing it to move beyond a certain distance per movement
     """
+    
     def __init__(self, pi, pin, left_limit=-math.pi / 2, right_limit=math.pi / 2, start_angle=0, dead_zone=0,
                  servo_speed=1.14, frame_rate=35, safety_factor=0.95):
         self.servo = Servo(pi, pin, right_limit, left_limit, start_angle)
@@ -38,7 +40,7 @@ class ServoController:
         
         # ensure that servo moves at most by max_move
         limit(offset, -self.max_move, self.max_move)
-
+        
         # ensure servo doesn't move beyond limits
         angle_dst = limit(self.cur_angle + offset, self.left_limit, self.right_limit)
         

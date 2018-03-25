@@ -29,9 +29,9 @@ class RotaryEncoder:
         self.lev_a = self.pi.read(a)
         self.lev_b = self.pi.read(b)
         
-        self.cb_a = self.pi.check_current(a, pigpio.EITHER_EDGE, self._pulse)
-        self.cb_b = self.pi.check_current(b, pigpio.EITHER_EDGE, self._pulse)
-        # self.cb_x = self.pi.check_current(x, pigpio.RISING_EDGE, self._report)
+        self.cb_a = self.pi.callback(a, pigpio.EITHER_EDGE, self._pulse)
+        self.cb_b = self.pi.callback(b, pigpio.EITHER_EDGE, self._pulse)
+        # self.cb_x = self.pi.callback(x, pigpio.RISING_EDGE, self._report)
     
     def _pulse(self, gpio, level, tick):
         # debounce
@@ -74,4 +74,3 @@ class RotaryEncoder:
         self.cb_a.cancel()
         self.cb_b.cancel()
         # self.cb_x.cancel()
-

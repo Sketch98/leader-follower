@@ -1,5 +1,6 @@
-import ball_estimator
 from multiprocessing import Queue
+
+import ball_estimator
 from servo_controller import ServoController
 
 
@@ -7,6 +8,7 @@ class PositionSystem:
     """
     finds the position of the ball relative to the vehicle
     """
+    
     def __init__(self, pi, servo_pin, frame_rate):
         self.pi = pi
         self.servo_controller = ServoController(pi, servo_pin, frame_rate=frame_rate)

@@ -5,6 +5,7 @@ class Servo:
     """
     implements the hardware parts of controlling a servo (converting angle to pwm)
     """
+    
     def __init__(self, pi, pin, left_limit, right_limit, start_angle):
         self.pi = pi
         self.pin = pin

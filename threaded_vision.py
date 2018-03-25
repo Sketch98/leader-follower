@@ -4,7 +4,7 @@ import cv2
 from imutils.video import VideoStream
 
 
-class Vision:
+class ThreadedVision:
     def __init__(self, pink, resolution, min_obj_width):
         self.pink = pink
         self.min_obj_width = min_obj_width

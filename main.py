@@ -1,17 +1,19 @@
-from vision_controller import VisionController
-from position_system import PositionSystem
-# from drive_system import DriveSystem
 import pigpio
+
+from position_system import PositionSystem
+from vision_controller import VisionController
+
+# from drive_system import DriveSystem
 
 
 # all distances in mm and angles in radians
 pink = ((160, 100, 120), (180, 210, 255))
 screenwidth = (320, 240)
 frame_rate = 20
-left_pins = {'pwm': 6, 'dir': 5, 'a': 0, 'b': 0}
-right_pins = {'pwm': 26, 'dir': 13, 'a': 0, 'b': 0}
+left_pins = {'pwm': 6, 'dir': 5, 'a': 4, 'b': 17}
+right_pins = {'pwm': 26, 'dir': 13, 'a': 22, 'b': 27}
 # TODO: tune this
-motor_pid_constants = {'kp': 0.0, 'ki': 0.0, 'kd': 0.0}
+motor_pi_constants = {'kp': 0.00102, 'ki': 0.0178333}
 pi = pigpio.pi()
 v = VisionController(pink, screenwidth)
 # d = DriveSystem(pi, left_pins, right_pins, motor_pid_constants)

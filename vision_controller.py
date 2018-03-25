@@ -1,5 +1,6 @@
-from vision import Vision
 from time import time
+
+from vision import Vision
 
 
 class VisionController:
@@ -21,7 +22,7 @@ class VisionController:
             
             cur_time = time()
             if cur_time != last_time and x > 0:
-                print('fps {}   x {}   diameter {}'.format(1.0/(cur_time - last_time), x, diameter))
+                print('fps {}   x {}   diameter {}'.format(1.0 / (cur_time - last_time), x, diameter))
             last_time = cur_time
-
+            
             self.callback(x, diameter, self.resolution[0])

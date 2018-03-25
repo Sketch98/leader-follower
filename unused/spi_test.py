@@ -1,7 +1,7 @@
 import time
+
 import Adafruit_GPIO.SPI as spi
 import Adafruit_MCP3008 as mcp3008
-
 
 # Hardware SPI configuration:
 SPI_PORT = 0

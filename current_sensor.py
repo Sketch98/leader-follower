@@ -2,7 +2,7 @@ current_coefficient = 0.0488
 
 
 class CurrentSensor:
-    def __init__(self, mcp, channel, limit=80):
+    def __init__(self, mcp, channel, limit=50):
         self.mcp = mcp
         self.channel = channel
         self.counter = 0
@@ -10,7 +10,8 @@ class CurrentSensor:
     
     def check_current(self):
         # convert adc reading to amps
-        current = self.mcp.read_channel(self.channel)*current_coefficient
+        current = self.mcp.read_channel(self.channel) * current_coefficient
+        print('current={}A'.format(current))
         if current >= 10:
             self.counter += 1
             if self.counter >= self.limit:
