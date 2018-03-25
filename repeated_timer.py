@@ -15,13 +15,13 @@ class RepeatedTimer:
         self.thread = Thread(target=self._target)
     
     def _target(self):
-        while not self.event.wait(self._time):
-            self.func(*self.args, **self.kwargs)
+        # use self._time instead of self.interval for exact timing
+        while not self.event.wait(self.interval):
+            self.func(*self.args, interval=self.interval, **self.kwargs)
     
     @property
     def _time(self):
-        return self.interval
-        # return self.interval - ((time.time() - self.start_time) % self.interval)
+        return self.interval - ((time.time() - self.start_time) % self.interval)
     
     def start(self):
         self.thread.start()

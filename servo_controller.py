@@ -12,37 +12,33 @@ def limit(val, lower_limit, upper_limit):
     return val
 
 
+servo_speed = 1.14
+frame_rate = 35
+max_move = 2 * math.pi / servo_speed / frame_rate
+
+
 class ServoController:
     """
-    handles the non-hardware parts of controlling a servo which are relative movements
-    and not allowing it to move beyond a certain distance per movement
+    handles the non-gpio parts of controlling a servo which are relative
+    movements and not allowing it to move beyond a certain distance per movement
     """
     
-    def __init__(self, pi, pin, left_limit=-math.pi / 2, right_limit=math.pi / 2, start_angle=0, dead_zone=0,
-                 servo_speed=1.14, frame_rate=35, safety_factor=0.95):
-        self.servo = Servo(pi, pin, right_limit, left_limit, start_angle)
+    def __init__(self, pi, pin, left_limit=-math.pi / 2, right_limit=math.pi / 2):
+        self.servo = Servo(pi, pin, right_limit, left_limit)
         self.left_limit = left_limit
         self.right_limit = right_limit
-        self.cur_angle = start_angle
-        self.dead_zone = dead_zone
-        self.last_seen = start_angle
-        
-        # the max angle that the servo can move by in 1 frame
-        self.max_move = 2 * math.pi * safety_factor / servo_speed / frame_rate
+        self.cur_angle = (left_limit + right_limit) / 2
     
     def get_angle(self):
         return self.cur_angle
     
     def move_by(self, offset):
-        # don't move inside dead_zone
-        if abs(offset) < self.dead_zone:
-            offset = 0
-        
         # ensure that servo moves at most by max_move
-        limit(offset, -self.max_move, self.max_move)
+        limit(offset, -max_move, max_move)
         
         # ensure servo doesn't move beyond limits
-        angle_dst = limit(self.cur_angle + offset, self.left_limit, self.right_limit)
+        angle_dst = limit(self.cur_angle + offset, self.left_limit,
+                          self.right_limit)
         
         self.cur_angle = angle_dst
         self.servo.move_to(angle_dst)

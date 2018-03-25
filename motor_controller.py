@@ -1,15 +1,15 @@
 from current_sensor import CurrentSensor
 from motor import Motor
-from pid import PIController
+from pid import PIDController
 from rotary_encoder import RotaryEncoder
 
 
 class MotorController:
-    def __init__(self, pi, mcp, channel, pins, pi_constants, forward=1):
+    def __init__(self, pi, mcp, channel, pins, pid_constants, forward=1):
         self.current_sensor = CurrentSensor(mcp, channel)
         self.motor = Motor(pi, pins['pwm'], pins['dir'], forward=forward)
         self.encoder = RotaryEncoder(pi, pins['a'], pins['b'])
-        self.pid = PIController(pi_constants['kp'], pi_constants['ki'])
+        self.pid = PIDController(pid_constants['kp'], pid_constants['ki'], pid_constants['kd'])
     
     def adjust_motor_speed(self, target_vel, vel, max_edges_per_second):
         error = (target_vel - vel) / max_edges_per_second
@@ -20,7 +20,8 @@ class MotorController:
         self.encoder.stop()
     
     def check_current(self):
-        # TODO: the motor should temporarily stop while the current lowers instead of shutting off permanently
+        # TODO: the motor should temporarily stop while the current lowers
+        # instead of shutting off permanently
         if self.current_sensor.check_current():
             self.motor.stop()
             raise Exception('motor current trip')

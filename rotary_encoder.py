@@ -11,7 +11,6 @@ class RotaryEncoder:
         self.pi = pi
         self.gpio_a = a
         self.gpio_b = b
-        # self.gpio_x = x
         
         self.last_gpio = None
         self.last_level = None
@@ -20,18 +19,15 @@ class RotaryEncoder:
         
         self.pi.set_mode(a, pigpio.INPUT)
         self.pi.set_mode(b, pigpio.INPUT)
-        # self.pi.set_mode(x, pigpio.INPUT)
         
         self.pi.set_pull_up_down(a, pigpio.PUD_UP)
         self.pi.set_pull_up_down(b, pigpio.PUD_UP)
-        # self.pi.set_pull_up_down(x, pigpio.PUD_UP)
         
         self.lev_a = self.pi.read(a)
         self.lev_b = self.pi.read(b)
         
         self.cb_a = self.pi.callback(a, pigpio.EITHER_EDGE, self._pulse)
         self.cb_b = self.pi.callback(b, pigpio.EITHER_EDGE, self._pulse)
-        # self.cb_x = self.pi.callback(x, pigpio.RISING_EDGE, self._report)
     
     def _pulse(self, gpio, level, tick):
         # debounce
@@ -53,10 +49,6 @@ class RotaryEncoder:
             else:
                 self.pos += 1
     
-    # def _report(self, gpio, level, tick):
-    #     print("pos={}, dif={}".format(self.pos, self.pos - self.last_pos))
-    #     self.last_pos = self.pos
-    
     def zero(self):
         self.pos = 0
     
@@ -73,4 +65,3 @@ class RotaryEncoder:
         # Cancel the rotary encoder callback
         self.cb_a.cancel()
         self.cb_b.cancel()
-        # self.cb_x.cancel()

@@ -1,10 +1,8 @@
 import pigpio
 
+from drive_system import DriveSystem
 from position_system import PositionSystem
 from vision_controller import VisionController
-
-# from drive_system import DriveSystem
-
 
 # all distances in mm and angles in radians
 pink = ((160, 100, 120), (180, 210, 255))
@@ -16,7 +14,7 @@ right_pins = {'pwm': 26, 'dir': 13, 'a': 22, 'b': 27}
 motor_pi_constants = {'kp': 0.00102, 'ki': 0.0178333}
 pi = pigpio.pi()
 v = VisionController(pink, screenwidth)
-# d = DriveSystem(pi, left_pins, right_pins, motor_pid_constants)
+d = DriveSystem(pi, left_pins, right_pins, motor_pi_constants)
 p = PositionSystem(pi, 18, frame_rate)
 
 
@@ -26,17 +24,18 @@ def vision_callback(x, diameter, sw):
         p.adjust_servo(ball_angle)
 
 
-# def get_next_target():
-#     if p.has_next_target():
-#         p.next_target()
+def get_next_target():
+    if p.has_next_target():
+        p.next_target()
 
 
 v.set_callback(vision_callback)
 
 try:
+    d.start()
     v.loop()
 except KeyboardInterrupt:
     print('im dead')
 finally:
     print('stopping')
-    # d.stop()
+    d.stop()
