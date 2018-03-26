@@ -11,7 +11,6 @@ class CurrentSensor:
     def check_current(self):
         # convert adc reading to amps
         current = self.mcp.read_channel(self.channel) * current_coefficient
-        print('current={}A'.format(current))
         if current >= 10:
             self.counter += 1
             if self.counter >= self.limit:
