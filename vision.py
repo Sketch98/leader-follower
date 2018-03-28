@@ -2,38 +2,28 @@ import time
 
 import cv2
 from imutils.video import VideoStream
+from parameters import pink, resolution, min_obj_radius
 
 
 class Vision:
-    def __init__(self, pink, resolution, min_obj_width):
-        self.pink = pink
-        self.min_obj_width = min_obj_width
-        
+    def __init__(self):
         # initialize the video stream and allow the camera sensor to warm up
         self.vs = VideoStream(usePiCamera=True, resolution=resolution).start()
         time.sleep(2.0)
     
-    def analyze_frame(self):
-        # grab the current frame
+    def _analyze_frame(self):
+        # grab the current frame and convert it to the HSV color space
         frame = self.vs.read()
-        
-        # blur the frame and convert it to the HSV color space
-        # frame = cv2.GaussianBlur(frame, (11, 11), 0)
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         
         # construct a mask for the color pink, then perform a series of
         # dilations and erosions to remove any small blobs left in the mask
-        mask = cv2.inRange(hsv, self.pink[0], self.pink[1])
+        mask = cv2.inRange(hsv, pink[0], pink[1])
         mask = cv2.erode(mask, None, iterations=2)
         mask = cv2.dilate(mask, None, iterations=2)
         
-        # # dilate then erode to connect close together blobs
-        # mask = cv2.dilate(mask, None, iterations=4)
-        # mask = cv2.erode(mask, None, iterations=4)
-        
         # find contours in the mask
-        contours = \
-            cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
+        contours = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
         
         x = -1
         y = -1
@@ -46,16 +36,19 @@ class Vision:
             ((x, y), radius) = cv2.minEnclosingCircle(c)
             
             # only proceed if the radius meets a minimum size
-            if radius >= self.min_obj_width / 2:
+            if radius >= min_obj_radius:
                 x = x
                 y = y
-                diameter = (radius * 2)
-        
-        # commands for displaying to monitor
-        # cv2.imshow("Mask", mask)
-        # cv2.waitKey(1)
+                diameter = radius*2
         
         return x, y, diameter
+    
+    def loop(self, callback):
+        while True:
+            # not using the y position of the ball in frame currently
+            x, _, diameter = self._analyze_frame()
+            
+            callback(x, diameter)
     
     def stop(self):
         self.vs.stop()

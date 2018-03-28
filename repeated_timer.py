@@ -10,20 +10,23 @@ class RepeatedTimer:
         self.func = func
         self.args = args
         self.kwargs = kwargs
-        self.start_time = time.time()
+        self.last_time = 0
         self.event = Event()
         self.thread = Thread(target=self._target)
     
     def _target(self):
         # use self._time instead of self.interval for exact timing
-        while not self.event.wait(self.interval):
+        while not self.event.wait(self._time):
             self.func(*self.args, interval=self.interval, **self.kwargs)
     
-    @property
     def _time(self):
-        return self.interval - ((time.time() - self.start_time) % self.interval)
+        time_elapsed = time.time() - self.last_time
+        assert self.interval > time_elapsed, 'drive_system loop took {}s which is longer than longer than' \
+                                             'the allowed interval {}s'.format(time_elapsed, self.interval)
+        return self.interval - time_elapsed
     
     def start(self):
+        self.last_time = time.time()
         self.thread.start()
     
     def stop(self):

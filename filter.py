@@ -1,7 +1,7 @@
 class Filter:
     def __init__(self, coefficients=(-3, 12, 17, 12, -3)):
         self.coefficients = coefficients
-        self.buffer = [0.0] * len(coefficients)
+        self.buffer = [0.0]*len(coefficients)
     
     def queue(self, val):
         for i in range(len(self.buffer) - 1):
@@ -13,6 +13,6 @@ class Filter:
         avg = 0.0
         normalizing_factor = 0.0
         for i in range(len(self.buffer)):
-            avg += self.buffer[i] * self.coefficients[i]
+            avg += self.buffer[i]*self.coefficients[i]
             normalizing_factor += self.coefficients[i]
-        return avg / normalizing_factor
+        return avg/normalizing_factor

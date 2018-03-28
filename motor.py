@@ -30,7 +30,7 @@ class Motor:
             self._set_dir(self.forward)
         else:
             self._set_dir(self.forward ^ 1)
-        self._set_pwm(abs(speed) * self.pwm_range)
+        self._set_pwm(abs(speed)*self.pwm_range)
 
 
 if __name__ == "__main__":
@@ -48,24 +48,24 @@ if __name__ == "__main__":
     
     base_speed = 20
     for speed in range(0, base_speed + 1, 1):
-        left_motor.set_speed(speed / 100.0)
-        right_motor.set_speed(speed / 100.0)
+        left_motor.set_speed(speed/100.0)
+        right_motor.set_speed(speed/100.0)
         time.sleep(0.1)
     limit_speed = 40
     time.sleep(1)
     try:
         while True:
             for speed in range(base_speed, limit_speed + 1, 1):
-                left_motor.set_speed(speed / 100.0)
-                right_motor.set_speed(speed / 100.0)
+                left_motor.set_speed(speed/100.0)
+                right_motor.set_speed(speed/100.0)
                 time.sleep(0.1)
                 print(left_enc.get_pos_dif())
                 print(right_enc.get_pos_dif())
                 print(speed)
                 print('')
             for speed in range(0, limit_speed - base_speed + 1, 1):
-                left_motor.set_speed((limit_speed - speed) / 100.0)
-                right_motor.set_speed((limit_speed - speed) / 100.0)
+                left_motor.set_speed((limit_speed - speed)/100.0)
+                right_motor.set_speed((limit_speed - speed)/100.0)
                 time.sleep(0.1)
                 print(left_enc.get_pos_dif())
                 print(right_enc.get_pos_dif())

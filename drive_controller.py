@@ -1,0 +1,47 @@
+from filter import Filter
+from mcp3008 import MCP3008
+from motor_controller import MotorController
+from parameters import distance_between_wheels, distance_ratio, left_pins, max_wheel_vel, motor_pid_constants, \
+    right_pins
+
+
+class DriveController:
+    """
+    implement forward and reverse kinematics of the robot's motors
+    """
+    
+    def __init__(self, raspi):
+        _mcp = MCP3008()
+        self._left_motor_controller = MotorController(raspi, _mcp, 0, left_pins, motor_pid_constants, forward=0)
+        self._right_motor_controller = MotorController(raspi, _mcp, 1, right_pins, motor_pid_constants, forward=1)
+        self._left_filter = Filter(coefficients=tuple([float(i + 1) for i in range(10)]))
+        self._right_filter = Filter(coefficients=tuple([float(i + 1) for i in range(10)]))
+        self._left_vel = 0
+        self._right_vel = 0
+    
+    def read_encoders(self, interval):
+        # get movement of left and right wheels
+        left_pos_dif = self._left_motor_controller.get_pos_dif()*distance_ratio
+        right_pos_dif = self._right_motor_controller.get_pos_dif()*distance_ratio
+        
+        # average 10 samples and update wheel velocities
+        left_pos_dif = self._left_filter.queue(left_pos_dif)
+        right_pos_dif = self._right_filter.queue(right_pos_dif)
+        
+        dist = (left_pos_dif + right_pos_dif)/2
+        angle = (left_pos_dif - right_pos_dif)/distance_between_wheels
+        return dist, angle
+    
+    def update_motors(self, forward_vel, angular_vel):
+        target_left_vel = forward_vel + distance_between_wheels*angular_vel/2
+        target_right_vel = forward_vel - distance_between_wheels*angular_vel/2
+        self._left_motor_controller.adjust_motor_speed(target_left_vel, self._left_vel, max_wheel_vel)
+        self._right_motor_controller.adjust_motor_speed(target_right_vel, self._right_vel, max_wheel_vel)
+    
+    def check_current(self):
+        self._left_motor_controller.check_current()
+        self._right_motor_controller.check_current()
+    
+    def stop(self):
+        self._left_motor_controller.stop()
+        self._right_motor_controller.stop()

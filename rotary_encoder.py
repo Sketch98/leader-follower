@@ -6,9 +6,9 @@ class RotaryEncoder:
     decodes quadrature signal from a rotary encoder
     """
     
-    def __init__(self, pi, a, b):
+    def __init__(self, raspi, a, b):
         
-        self.pi = pi
+        self.raspi = raspi
         self.gpio_a = a
         self.gpio_b = b
         
@@ -17,17 +17,17 @@ class RotaryEncoder:
         self.pos = 0
         self.last_pos = 0
         
-        self.pi.set_mode(a, pigpio.INPUT)
-        self.pi.set_mode(b, pigpio.INPUT)
+        self.raspi.set_mode(a, pigpio.INPUT)
+        self.raspi.set_mode(b, pigpio.INPUT)
         
-        self.pi.set_pull_up_down(a, pigpio.PUD_UP)
-        self.pi.set_pull_up_down(b, pigpio.PUD_UP)
+        self.raspi.set_pull_up_down(a, pigpio.PUD_UP)
+        self.raspi.set_pull_up_down(b, pigpio.PUD_UP)
         
-        self.lev_a = self.pi.read(a)
-        self.lev_b = self.pi.read(b)
+        self.lev_a = self.raspi.read(a)
+        self.lev_b = self.raspi.read(b)
         
-        self.cb_a = self.pi.callback(a, pigpio.EITHER_EDGE, self._pulse)
-        self.cb_b = self.pi.callback(b, pigpio.EITHER_EDGE, self._pulse)
+        self.cb_a = self.raspi.callback(a, pigpio.EITHER_EDGE, self._pulse)
+        self.cb_b = self.raspi.callback(b, pigpio.EITHER_EDGE, self._pulse)
     
     def _pulse(self, gpio, level, tick):
         # debounce
