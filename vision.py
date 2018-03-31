@@ -33,12 +33,12 @@ class Vision:
             # find the largest contour in the mask, then use it to compute
             # the minimum enclosing circle and centroid
             c = max(contours, key=cv2.contourArea)
-            ((x, y), radius) = cv2.minEnclosingCircle(c)
+            ((x_pix, y_pix), radius) = cv2.minEnclosingCircle(c)
             
             # only proceed if the radius meets a minimum size
             if radius >= min_obj_radius:
-                x = x
-                y = y
+                x = x_pix
+                y = y_pix
                 diameter = radius*2
         
         return x, y, diameter

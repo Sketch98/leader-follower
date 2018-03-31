@@ -13,7 +13,8 @@ min_obj_radius = 5
 # pids
 servo_pid_constants = {'kp': 0.25, 'ki': 0, 'kd': 0}
 motor_pid_constants = {'kp': 0.00102, 'ki': 0.0178333, 'kd': 0}
-speed_pid_constants = {'kp': 1, 'ki': 0, 'kd': 0}
+forward_pid_constants = {'kp': 1, 'ki': 0, 'kd': 0}
+angle_pid_constants = {'kp': 1, 'ki': 0, 'kd': 0}
 
 # encoder stuff
 encoder_edges_per_rev = 192
@@ -37,4 +38,4 @@ max_move = 2*pi/servo_speed/frame_rate
 
 motor_acceleration_limit = 0.01
 
-target_dist_offset = 0.7
+target_dist_offset = 700
