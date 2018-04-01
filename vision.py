@@ -44,10 +44,13 @@ class Vision:
         return x, y, diameter
     
     def loop(self, callback):
+        t = time.time()
         while True:
             # not using the y position of the ball in frame currently
             x, _, diameter = self._analyze_frame()
             
+            print(1/(t - time.time()))
+            t = time.time()
             callback(x, diameter)
     
     def stop(self):

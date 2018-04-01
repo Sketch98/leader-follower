@@ -19,11 +19,12 @@ class Motor:
         self.pi.write(self.dir_pin, direction)
     
     def _set_pwm(self, pwm):
+        pwm = max(min(pwm, 5000), -5000)
         assert self.pwm_range >= pwm >= 0, 'invalid pwm = {} in _set_pwm'.format(pwm)
         self.pi.set_PWM_dutycycle(self.pwm_pin, int(pwm))
     
     def stop(self):
-        self.pi.set_PWM_dutycycle(self.pwm_pin, 0)
+        self._set_pwm(0)
     
     def set_speed(self, speed):
         if speed >= 0:

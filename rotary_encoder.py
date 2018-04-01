@@ -65,3 +65,18 @@ class RotaryEncoder:
         # Cancel the rotary encoder callback
         self.cb_a.cancel()
         self.cb_b.cancel()
+
+
+if __name__ == "__main__":
+    import time
+    
+    raspi = pigpio.pi()
+    encoder = RotaryEncoder(raspi, 17, 27)
+    try:
+        while True:
+            print(encoder.get_pos_dif())
+            print(encoder.get_pos())
+            time.sleep(0.01)
+    except KeyboardInterrupt:
+        encoder.stop()
+        raspi.stop()

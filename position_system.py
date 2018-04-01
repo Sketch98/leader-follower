@@ -25,7 +25,7 @@ def calc_ball_coordinates(servo_angle, x_pix, diameter):
     dist = abs(33.1/tan((right_angle - left_angle))) + camera_dist_offset
     x = dist*sin(ball_angle)
     y = dist*cos(ball_angle)
-    return x, y, dist, camera_to_ball_angle
+    return x, y, dist, camera_to_ball_angle, ball_angle
 
 
 def calc_abs_pos(x_vehicle, y_vehicle, vehicle_theta, x_ball, y_ball):
@@ -46,15 +46,25 @@ class PositionSystem:
         self._servo_controller = ServoController(raspi, servo_pin, servo_pid_constants)
         self._servo_pid = PID(servo_pid_constants['kp'], servo_pid_constants['ki'], servo_pid_constants['kd'])
         self.dist_filter = Filter(coefficients=tuple([float(i + 1) for i in range(10)]))
+        self.ball_filter = Filter(coefficients=tuple([float(i + 1) for i in range(10)]))
     
     def do_shit(self, x, diameter):
         if x < 0:
             self._servo_controller.track()
+            self._nav_system.paused = True
+            self._nav_system.angle_to_ball = 0
+            return
         
+        self._nav_system.paused = False
         servo_angle = self._servo_controller.angle
-        (ball_x, ball_y, dist, ball_angle) = calc_ball_coordinates(servo_angle, x, diameter)
-        self._servo_controller.move_by(self._servo_pid.calc(ball_angle))
-        self._nav_system.dist_to_ball = self.dist_filter.queue(dist)
+        # print(servo_angle)
+        (ball_x, ball_y, dist, camera_to_ball_angle, ball_angle) = calc_ball_coordinates(servo_angle, x, diameter)
+        self._servo_controller.move_by(self._servo_pid.calc(camera_to_ball_angle))
+        dist = self.dist_filter.queue(dist)
+        ball_angle = self.ball_filter.queue(ball_angle)
+        self._nav_system.dist_to_ball = dist
         self._nav_system.angle_to_ball = ball_angle
-        
-        return ball_angle
+        return
+    
+    def stop(self):
+        self._servo_controller.stop()

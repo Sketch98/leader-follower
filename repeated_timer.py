@@ -16,7 +16,7 @@ class RepeatedTimer:
     
     def _target(self):
         # use self._time instead of self.interval for exact timing
-        while not self.event.wait(self._time):
+        while not self.event.wait(self.interval):
             self.func(*self.args, interval=self.interval, **self.kwargs)
     
     def _time(self):

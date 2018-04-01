@@ -32,7 +32,7 @@ class MotorController:
         # instead of shutting off permanently
         if self.current_sensor.check_current():
             self.motor.stop()
-            raise Exception('motor current trip')
+            # raise Exception('motor current trip')
     
     def get_pos_dif(self):
         return self.encoder.get_pos_dif()

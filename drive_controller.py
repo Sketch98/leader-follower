@@ -27,6 +27,8 @@ class DriveController:
         # average 10 samples and update wheel velocities
         left_pos_dif = self._left_filter.queue(left_pos_dif)
         right_pos_dif = self._right_filter.queue(right_pos_dif)
+        self._left_vel = left_pos_dif/interval
+        self._right_vel = right_pos_dif/interval
         
         dist = (left_pos_dif + right_pos_dif)/2
         angle = (left_pos_dif - right_pos_dif)/distance_between_wheels
@@ -45,3 +47,18 @@ class DriveController:
     def stop(self):
         self._left_motor_controller.stop()
         self._right_motor_controller.stop()
+
+
+if __name__ == '__main__':
+    import pigpio
+    from time import sleep
+    
+    raspi = pigpio.pi()
+    d = DriveController(raspi)
+    try:
+        while True:
+            d.update_motors(100, 0)
+            sleep(0.01)
+    except KeyboardInterrupt:
+        d.stop()
+        raspi.stop()

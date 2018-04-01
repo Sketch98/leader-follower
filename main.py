@@ -15,3 +15,4 @@ try:
 except KeyboardInterrupt:
     n.stop()
     v.stop()
+    p.stop()

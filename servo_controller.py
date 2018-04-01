@@ -16,8 +16,8 @@ class ServoController:
         self._pid = PID(pid_constants['kp'], pid_constants['ki'], pid_constants['kd'])
         self._target = 0.0
         
-        if right_limit >= left_limit:
-            raise Exception('right_limit >= left_limit')
+        if left_limit >= right_limit:
+            raise Exception('left_limit >= right_limit')
         self._left_limit = left_limit
         self._right_limit = right_limit
         self.angle = (self._left_limit + self._right_limit)/2
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     
     raspi = pigpio.pi()
     pid_constants = {'kp': 0.25, 'ki': 0, 'kd': 0}
-    servo_controller = ServoController(raspi, 18, pid_constants)
+    servo_controller = ServoController(raspi, 25, pid_constants)
     time.sleep(1)
     for _ in range(18):
         servo_controller.move_by(-5)
