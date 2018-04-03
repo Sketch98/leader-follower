@@ -49,3 +49,5 @@ camera_x_offset = 0
 camera_y_offset = 0
 # distance from center of camera servo to camera sensor
 camera_dist_offset = 0
+
+motor_pwm_range = 40000

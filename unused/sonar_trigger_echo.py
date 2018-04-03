@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import time
+from time import time, sleep
 
 import pigpio
 
@@ -17,12 +17,12 @@ class Ranger:
     the high and low edges indicates the sonar round trip time.
     """
     
-    def __init__(self, pi, trigger, echo):
+    def __init__(self, trigger, echo):
         """
         The class is instantiated with the Pi to use and the
         gpios connected to the trigger and echo pins.
         """
-        self.pi = pi
+        global raspi
         self._trig = trigger
         self._echo = echo
         
@@ -32,14 +32,14 @@ class Ranger:
         
         self._triggered = False
         
-        self._trig_mode = pi.get_mode(self._trig)
-        self._echo_mode = pi.get_mode(self._echo)
+        self._trig_mode = raspi.get_mode(self._trig)
+        self._echo_mode = raspi.get_mode(self._echo)
+
+        raspi.set_mode(self._trig, pigpio.OUTPUT)
+        raspi.set_mode(self._echo, pigpio.INPUT)
         
-        pi.set_mode(self._trig, pigpio.OUTPUT)
-        pi.set_mode(self._echo, pigpio.INPUT)
-        
-        self._cb = pi.callback(self._trig, pigpio.EITHER_EDGE, self._cbf)
-        self._cb = pi.callback(self._echo, pigpio.EITHER_EDGE, self._cbf)
+        self._cb = raspi.callback(self._trig, pigpio.EITHER_EDGE, self._cbf)
+        self._cb = raspi.callback(self._echo, pigpio.EITHER_EDGE, self._cbf)
         
         self._inited = True
     
@@ -67,12 +67,13 @@ class Ranger:
         """
         if self._inited:
             self._ping = False
-            self.pi.gpio_trigger(self._trig)
-            start = time.time()
+            global raspi
+            raspi.gpio_trigger(self._trig)
+            start = time()
             while not self._ping:
-                if (time.time() - start) > 5.0:
+                if (time() - start) > 5.0:
                     return 20000
-                time.sleep(0.001)
+                sleep(0.001)
             return self._time
         else:
             return None
@@ -85,20 +86,21 @@ class Ranger:
         if self._inited:
             self._inited = False
             self._cb.cancel()
-            self.pi.set_mode(self._trig, self._trig_mode)
-            self.pi.set_mode(self._echo, self._echo_mode)
+            global raspi
+            raspi.set_mode(self._trig, self._trig_mode)
+            raspi.set_mode(self._echo, self._echo_mode)
 
 
 if __name__ == "__main__":
-    pi = pigpio.pi()
-    sonar = Ranger(pi, 23, 18)
-    end = time.time() + 600.0
+    raspi = pigpio.pi()
+    sonar = Ranger(23, 18)
+    end = time() + 600.0
     
     r = 1
-    while time.time() < end:
+    while time() < end:
         print("{} {}".format(r, sonar.read()))
         r += 1
-        time.sleep(0.03)
+        sleep(0.03)
     
     sonar.cancel()
-    pi.stop()
+    raspi.stop()

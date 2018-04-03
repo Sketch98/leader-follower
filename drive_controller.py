@@ -10,10 +10,9 @@ class DriveController:
     implement forward and reverse kinematics of the robot's motors
     """
     
-    def __init__(self, raspi):
-        _mcp = MCP3008()
-        self._left_motor_controller = MotorController(raspi, _mcp, 0, left_pins, motor_pid_constants, forward=0)
-        self._right_motor_controller = MotorController(raspi, _mcp, 1, right_pins, motor_pid_constants, forward=1)
+    def __init__(self):
+        self._left_motor_controller = MotorController(0, left_pins, motor_pid_constants, 0)
+        self._right_motor_controller = MotorController(1, right_pins, motor_pid_constants, 1)
         self._left_filter = Filter(coefficients=tuple([float(i + 1) for i in range(10)]))
         self._right_filter = Filter(coefficients=tuple([float(i + 1) for i in range(10)]))
         self._left_vel = 0
@@ -55,7 +54,7 @@ if __name__ == '__main__':
     from time import sleep
     
     raspi = pigpio.pi()
-    d = DriveController(raspi)
+    d = DriveController()
     try:
         while True:
             d.update_motors(100, 0)

@@ -1,51 +1,50 @@
 import pigpio
-
+from parameters import motor_pwm_range
 
 class Motor:
-    def __init__(self, pi, pwm_pin, dir_pin, pwm_range=40000, forward=1):
-        self.pi = pi
-        self.pwm_pin = pwm_pin
-        self.dir_pin = dir_pin
-        self.pwm_range = pwm_range
-        self.forward = forward
-        
-        self.pi.set_mode(pwm_pin, pigpio.OUTPUT)
-        self.pi.set_PWM_range(pwm_pin, pwm_range)
-        self.pi.set_mode(dir_pin, pigpio.OUTPUT)
+    def __init__(self, pwm_pin, dir_pin, forward):
+        self._pwm_pin = pwm_pin
+        self._dir_pin = dir_pin
+        self._forward = forward
+
+        global raspi
+        raspi.set_mode(pwm_pin, pigpio.OUTPUT)
+        raspi.set_PWM_range(pwm_pin, motor_pwm_range)
+        raspi.set_mode(dir_pin, pigpio.OUTPUT)
         self.stop()
     
     def _set_dir(self, direction):
+        global raspi
         assert direction in [0, 1], 'invalid direction = {} in _set_dir'.format(direction)
-        self.pi.write(self.dir_pin, direction)
+        raspi.write(self._dir_pin, direction)
     
     def _set_pwm(self, pwm):
+        global raspi
         pwm = max(min(pwm, 5000), -5000)
-        assert self.pwm_range >= pwm >= 0, 'invalid pwm = {} in _set_pwm'.format(pwm)
-        self.pi.set_PWM_dutycycle(self.pwm_pin, int(pwm))
+        assert motor_pwm_range >= pwm >= 0, 'invalid pwm = {} in _set_pwm'.format(pwm)
+        raspi.set_PWM_dutycycle(self._pwm_pin, int(pwm))
     
     def stop(self):
         self._set_pwm(0)
     
     def set_speed(self, speed):
         if speed >= 0:
-            self._set_dir(self.forward)
+            self._set_dir(self._forward)
         else:
-            self._set_dir(self.forward ^ 1)
-        self._set_pwm(abs(speed)*self.pwm_range)
+            self._set_dir(self._forward ^ 1)
+        self._set_pwm(abs(speed)*motor_pwm_range)
 
 
 if __name__ == "__main__":
     import time
     from rotary_encoder import RotaryEncoder
+    from parameters import left_pins, right_pins
     
-    pi = pigpio.pi()
-    
-    left_pins = {'pwm': 6, 'dir': 5, 'a': 4, 'b': 17}
-    right_pins = {'pwm': 26, 'dir': 13, 'a': 22, 'b': 27}
-    left_motor = Motor(pi, 6, 5, forward=0)
-    right_motor = Motor(pi, 26, 13)
-    left_enc = RotaryEncoder(pi, 4, 17)
-    right_enc = RotaryEncoder(pi, 22, 27)
+    raspi = pigpio.pi()
+    left_motor = Motor(left_pins['pwm'], left_pins['dir'], 0)
+    right_motor = Motor(right_pins['pwm'], right_pins['dir'], 1)
+    left_enc = RotaryEncoder(left_pins['a'], left_pins['b'])
+    right_enc = RotaryEncoder(right_pins['a'], right_pins['b'])
     
     base_speed = 20
     for speed in range(0, base_speed + 1, 1):
@@ -79,4 +78,4 @@ if __name__ == "__main__":
         right_motor.stop()
         left_enc.stop()
         right_enc.stop()
-        pi.stop()
+        raspi.stop()

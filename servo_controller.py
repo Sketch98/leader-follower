@@ -11,8 +11,8 @@ def limit(val, lower_limit, upper_limit):
 
 
 class ServoController:
-    def __init__(self, raspi, pin, pid_constants, left_limit=-pi/2, right_limit=pi/2):
-        self._servo = Servo(raspi, pin)
+    def __init__(self, pin, pid_constants, left_limit=-pi/2, right_limit=pi/2):
+        self._servo = Servo(pin)
         self._pid = PID(pid_constants)
         
         if left_limit >= right_limit:
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     from parameters import servo_pid_constants
     
     raspi = pigpio.pi()
-    servo_controller = ServoController(raspi, 25, servo_pid_constants)
+    servo_controller = ServoController(25, servo_pid_constants)
     sleep(0.5)
     servo_controller.move_by(-pi/2)
     sleep(0.1)
