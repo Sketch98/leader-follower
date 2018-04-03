@@ -1,25 +1,25 @@
 class PID:
     def __init__(self, pid_constants):
-        self.kp = pid_constants['kp']
-        self.ki = pid_constants['ki']
-        self.kd = pid_constants['kd']
-        self.integrator = 0
-        self.last_error = 0
+        self._kp = pid_constants['kp']
+        self._ki = pid_constants['ki']
+        self._kd = pid_constants['kd']
+        self._integrator = 0
+        self._last_error = 0
     
     def calc(self, error):
         # proportional
-        pid = self.kp*error
+        pid = self._kp*error
         
         # integral
-        self.integrator += error
-        pid += self.ki*self.integrator
+        self._integrator += error
+        pid += self._ki*self._integrator
         
         # differential
-        pid += self.kd*(error - self.last_error)
-        self.last_error = error
+        pid += self._kd*(error - self._last_error)
+        self._last_error = error
         
         return pid
     
     def reset(self):
-        self.integrator = 0
-        self.last_error = 0
+        self._integrator = 0
+        self._last_error = 0

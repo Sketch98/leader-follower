@@ -1,5 +1,7 @@
 import pigpio
+
 from parameters import button_delay
+
 
 class Button:
     """

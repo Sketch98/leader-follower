@@ -8,7 +8,7 @@ from vision import Vision
 raspi = pigpio.pi()
 mcp = MCP3008()
 vision = Vision()
-nav_system = NavSystem(raspi)
+nav_system = NavSystem()
 position_system = PositionSystem()
 
 try:

@@ -1,17 +1,19 @@
 import pigpio
+
 from parameters import motor_pwm_range
+
 
 class Motor:
     def __init__(self, pwm_pin, dir_pin, forward):
         self._pwm_pin = pwm_pin
         self._dir_pin = dir_pin
         self._forward = forward
-
+        
         global raspi
         raspi.set_mode(pwm_pin, pigpio.OUTPUT)
-        raspi.set_PWM_range(pwm_pin, motor_pwm_range)
         raspi.set_mode(dir_pin, pigpio.OUTPUT)
-        self.stop()
+        raspi.set_PWM_range(pwm_pin, motor_pwm_range)
+        self._set_pwm(0)
     
     def _set_dir(self, direction):
         global raspi

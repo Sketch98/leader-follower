@@ -1,8 +1,6 @@
 from filter import Filter
-from mcp3008 import MCP3008
 from motor_controller import MotorController
-from parameters import distance_between_wheels, distance_ratio, left_pins, motor_pid_constants, \
-    right_pins
+from parameters import distance_between_wheels, distance_ratio, left_pins, motor_pid_constants, right_pins
 
 
 class DriveController:

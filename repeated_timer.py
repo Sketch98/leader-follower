@@ -4,6 +4,7 @@ from threading import Event, Thread
 
 class RepeatedTimer:
     """Repeat `func` every `interval` seconds."""
+    
     def __init__(self, interval, func):
         self._interval = interval
         self._func = func
@@ -18,7 +19,7 @@ class RepeatedTimer:
     def _time(self):
         time_elapsed = time.time() - self._last_time
         assert self._interval > time_elapsed, 'drive_system loop took {}s which is longer than longer than' \
-                                             'the allowed interval {}s'.format(time_elapsed, self._interval)
+                                              'the allowed interval {}s'.format(time_elapsed, self._interval)
         return self._interval - time_elapsed
     
     def start(self):

@@ -14,8 +14,8 @@ class RotaryEncoder:
         
         self._last_gpio = None
         self._last_level = None
-        self.pos = 0
         self._last_pos = 0
+        self.pos = 0
         
         raspi.set_mode(a, pigpio.INPUT)
         raspi.set_mode(b, pigpio.INPUT)

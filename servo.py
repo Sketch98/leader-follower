@@ -12,6 +12,7 @@ class Servo:
         # angle ranges from 0 to 1
         assert 0 <= angle <= 1, 'angle {} not in [0, 1]'.format(angle)
         pulse_width = 2300 - 1800*angle
+        # use 500 + 1800*angle if servo is right-side-up
         global raspi
         raspi.set_servo_pulsewidth(self.pin, pulse_width)
     

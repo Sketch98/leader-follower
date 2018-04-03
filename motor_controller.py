@@ -27,8 +27,7 @@ class MotorController:
         # TODO: the motor should temporarily stop while the current lowers
         # instead of shutting off permanently
         if self._current_sensor.check_current():
-            self._motor.stop()
-            # raise Exception('motor current trip')
+            self._motor.stop()  # raise Exception('motor current trip')
     
     def get_pos_dif(self):
         return self._encoder.get_pos_dif()

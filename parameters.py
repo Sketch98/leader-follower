@@ -44,10 +44,9 @@ distance_ratio = wheel_circumference/encoder_edges_per_rev
 distance_between_wheels = 400
 max_wheel_vel = 16*wheel_circumference
 
-# x and y distance from center of wheels to center of camera servo
-camera_x_offset = 0
-camera_y_offset = 0
+# y distance from center of wheels to center of camera servo
+camera_y_offset = 30
 # distance from center of camera servo to camera sensor
-camera_dist_offset = 0
+camera_dist_offset = 10
 
 motor_pwm_range = 40000

@@ -1,7 +1,7 @@
 from math import cos, pi, sin
 
 from drive_controller import DriveController
-from parameters import target_dist_offset, forward_pid_constants, angle_pid_constants, small_angle, nav_timer_interval
+from parameters import angle_pid_constants, forward_pid_constants, nav_timer_interval, small_angle, target_dist_offset
 from pid import PID
 from repeated_timer import RepeatedTimer
 

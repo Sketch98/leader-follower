@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from time import time, sleep
+from time import sleep, time
 
 import pigpio
 
@@ -34,7 +34,7 @@ class Ranger:
         
         self._trig_mode = raspi.get_mode(self._trig)
         self._echo_mode = raspi.get_mode(self._echo)
-
+        
         raspi.set_mode(self._trig, pigpio.OUTPUT)
         raspi.set_mode(self._echo, pigpio.INPUT)
         

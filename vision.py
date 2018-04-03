@@ -3,18 +3,18 @@ import time
 import cv2
 from imutils.video import VideoStream
 
-from parameters import pink, resolution, min_obj_radius
+from parameters import min_obj_radius, pink, resolution
 
 
 class Vision:
     def __init__(self):
         # initialize the video stream and allow the camera sensor to warm up
-        self.vs = VideoStream(usePiCamera=True, resolution=resolution).start()
+        self._vs = VideoStream(usePiCamera=True, resolution=resolution).start()
         time.sleep(2.0)
     
     def _analyze_frame(self):
         # grab the current frame and convert it to the HSV color space
-        frame = self.vs.read()
+        frame = self._vs.read()
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         
         # construct a mask for the color pink, then perform a series of
@@ -55,4 +55,4 @@ class Vision:
             callback(x, diameter)
     
     def stop(self):
-        self.vs.stop()
+        self._vs.stop()
