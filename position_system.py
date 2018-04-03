@@ -1,11 +1,11 @@
-from math import asin, tan
+from math import asin, sin, cos, tan
 
 from filter import Filter
-from parameters import camera_dist_offset, resolution, servo_pid_constants, servo_pin
+from parameters import camera_dist_offset, camera_x_offset, camera_y_offset, resolution, servo_pid_constants, servo_pin
 from servo_controller import ServoController
 
 
-def get_angle_to_pixel(x_pix):
+def angle_to_pixel(x_pix):
     # corrects for camera's lens projecting curved light onto a flat sensor
     angle = asin(0.8643*(x_pix/resolution[0] - 0.5))
     return angle
@@ -16,8 +16,8 @@ def dist_angle_to_ball(x_pix, diameter):
     finds the angles to the left and right sides of the ball.
     it uses that to estimate the distance and angle to the ball.
     """
-    left_angle = get_angle_to_pixel(x_pix - diameter/2.0)
-    right_angle = get_angle_to_pixel(x_pix + diameter/2.0)
+    left_angle = angle_to_pixel(x_pix - diameter/2.0)
+    right_angle = angle_to_pixel(x_pix + diameter/2.0)
     ball_angle = (right_angle + left_angle)/2
     dist = abs(33.1/tan((right_angle - left_angle))) + camera_dist_offset
     return dist, ball_angle
@@ -54,7 +54,16 @@ class PositionSystem:
         # tell nav system where ball is
         self._nav_system.dist_to_ball = dist
         self._nav_system.angle_to_ball = vehicle_to_ball_angle
-        return
+        
+        self._queue_ball_loc(dist, vehicle_to_ball_angle)
+    
+    def _queue_ball_loc(self, dist, angle):
+        rel_x = dist*sin(angle) + camera_x_offset
+        rel_y = dist*cos(angle) + camera_y_offset
+        
+        veh_x, veh_y, veh_theta = self._nav_system.xy_theta
+        abs_x = veh_x + rel_x*cos(veh_theta) - rel_y*sin(veh_theta)
+        y_abs = veh_y - rel_x*sin(veh_theta) + rel_y*cos(veh_theta)
     
     def stop(self):
         self._servo_controller.stop()

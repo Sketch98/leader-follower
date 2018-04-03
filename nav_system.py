@@ -7,9 +7,6 @@ from repeated_timer import RepeatedTimer
 
 
 class NavSystem:
-    """
-    nav's shit
-    """
     
     def __init__(self, raspi):
         self._drive_controller = DriveController(raspi)
@@ -30,21 +27,21 @@ class NavSystem:
             self._drive_controller.update_motors(0.0, 0.0)
             return
         
-        # self.dead_reckon(dist, angle)
+        self._dead_reckon(dist, angle)
         
         forward_velocity = self._forward_pid.calc(self.dist_to_ball - target_dist_offset)
         angular_velocity = self._turn_pid.calc(self.angle_to_ball)
         self._drive_controller.update_motors(forward_velocity, angular_velocity)
     
-    def dead_reckon(self, dist, angle):
+    def _dead_reckon(self, dist, angle):
         if abs(angle) <= small_angle:
             x = self.xy_theta[0] + dist*sin(self.xy_theta[2])
             y = self.xy_theta[1] + dist*cos(self.xy_theta[2])
             theta = self.xy_theta[2] + angle%(2*pi)
             self.xy_theta = (x, y, theta)
             return
-        self.dead_reckon(dist/2, angle/2)
-        self.dead_reckon(dist/2, angle/2)
+        self._dead_reckon(dist/2, angle/2)
+        self._dead_reckon(dist/2, angle/2)
     
     def start(self):
         self._timer.start()
