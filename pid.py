@@ -1,8 +1,8 @@
 class PID:
-    def __init__(self, kp, ki, kd):
-        self.kp = kp
-        self.ki = ki
-        self.kd = kd
+    def __init__(self, pid_constants):
+        self.kp = pid_constants['kp']
+        self.ki = pid_constants['ki']
+        self.kd = pid_constants['kd']
         self.integrator = 0
         self.last_error = 0
     

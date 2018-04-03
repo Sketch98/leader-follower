@@ -11,7 +11,7 @@ p = PositionSystem(raspi, n)
 
 try:
     n.start()
-    v.loop(p.do_shit)
+    v.loop(p.do_stuff)
 except KeyboardInterrupt:
     n.stop()
     v.stop()

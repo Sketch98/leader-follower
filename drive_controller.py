@@ -1,7 +1,7 @@
 from filter import Filter
 from mcp3008 import MCP3008
 from motor_controller import MotorController
-from parameters import distance_between_wheels, distance_ratio, left_pins, max_wheel_vel, motor_pid_constants, \
+from parameters import distance_between_wheels, distance_ratio, left_pins, motor_pid_constants, \
     right_pins
 
 
@@ -30,6 +30,7 @@ class DriveController:
         self._left_vel = left_pos_dif/interval
         self._right_vel = right_pos_dif/interval
         
+        # use point and shoot method to estimate distance and angle
         dist = (left_pos_dif + right_pos_dif)/2
         angle = (left_pos_dif - right_pos_dif)/distance_between_wheels
         return dist, angle
@@ -37,8 +38,8 @@ class DriveController:
     def update_motors(self, forward_vel, angular_vel):
         target_left_vel = forward_vel + distance_between_wheels*angular_vel/2
         target_right_vel = forward_vel - distance_between_wheels*angular_vel/2
-        self._left_motor_controller.adjust_motor_speed(target_left_vel, self._left_vel, max_wheel_vel)
-        self._right_motor_controller.adjust_motor_speed(target_right_vel, self._right_vel, max_wheel_vel)
+        self._left_motor_controller.adjust_motor_speed(target_left_vel, self._left_vel)
+        self._right_motor_controller.adjust_motor_speed(target_right_vel, self._right_vel)
     
     def check_current(self):
         self._left_motor_controller.check_current()

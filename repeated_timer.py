@@ -5,11 +5,9 @@ from threading import Event, Thread
 class RepeatedTimer:
     """Repeat `func` every `interval` seconds."""
     
-    def __init__(self, interval, func, *args, **kwargs):
+    def __init__(self, interval, func):
         self.interval = interval
         self.func = func
-        self.args = args
-        self.kwargs = kwargs
         self.last_time = 0
         self.event = Event()
         self.thread = Thread(target=self._target)
@@ -17,7 +15,7 @@ class RepeatedTimer:
     def _target(self):
         # use self._time instead of self.interval for exact timing
         while not self.event.wait(self.interval):
-            self.func(*self.args, interval=self.interval, **self.kwargs)
+            self.func(interval=self.interval)
     
     def _time(self):
         time_elapsed = time.time() - self.last_time

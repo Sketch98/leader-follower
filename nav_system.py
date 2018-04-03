@@ -1,10 +1,9 @@
 from math import cos, pi, sin
 
 from drive_controller import DriveController
-from parameters import forward_pid_constants
+from parameters import target_dist_offset, forward_pid_constants, angle_pid_constants, small_angle, nav_timer_interval
 from pid import PID
 from repeated_timer import RepeatedTimer
-from parameters import target_dist_offset, angle_pid_constants
 
 
 class NavSystem:
@@ -12,12 +11,13 @@ class NavSystem:
     nav's shit
     """
     
-    def __init__(self, raspi, interval=0.01):
+    def __init__(self, raspi):
         self._drive_controller = DriveController(raspi)
-        self._forward_pid = PID(forward_pid_constants['kp'], forward_pid_constants['ki'], forward_pid_constants['kd'])
-        self._turn_pid = PID(angle_pid_constants['kp'], angle_pid_constants['ki'], angle_pid_constants['kd'])
-        self.x, self.y, self.theta = 0.0, 0.0, 0.0
-        self._timer = RepeatedTimer(interval, self.timer_callback)
+        self._forward_pid = PID(forward_pid_constants)
+        self._turn_pid = PID(angle_pid_constants)
+        self._timer = RepeatedTimer(nav_timer_interval, self.timer_callback)
+        
+        self.xy_theta = (0.0, 0.0, 0.0)
         self.dist_to_ball = target_dist_offset
         self.angle_to_ball = 0.0
         self.paused = False
@@ -36,11 +36,12 @@ class NavSystem:
         angular_velocity = self._turn_pid.calc(self.angle_to_ball)
         self._drive_controller.update_motors(forward_velocity, angular_velocity)
     
-    def dead_reckon(self, dist, angle, max_angle=pi/36):
-        if abs(angle) <= max_angle:
-            self.theta += angle % (2*pi)
-            self.x += dist*sin(self.theta)
-            self.y += dist*cos(self.theta)
+    def dead_reckon(self, dist, angle):
+        if abs(angle) <= small_angle:
+            x = self.xy_theta[0] + dist*sin(self.xy_theta[2])
+            y = self.xy_theta[1] + dist*cos(self.xy_theta[2])
+            theta = self.xy_theta[2] + angle%(2*pi)
+            self.xy_theta = (x, y, theta)
             return
         self.dead_reckon(dist/2, angle/2)
         self.dead_reckon(dist/2, angle/2)

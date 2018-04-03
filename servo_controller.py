@@ -13,8 +13,7 @@ def limit(val, lower_limit, upper_limit):
 class ServoController:
     def __init__(self, raspi, pin, pid_constants, left_limit=-pi/2, right_limit=pi/2):
         self._servo = Servo(raspi, pin)
-        self._pid = PID(pid_constants['kp'], pid_constants['ki'], pid_constants['kd'])
-        self._target = 0.0
+        self._pid = PID(pid_constants)
         
         if left_limit >= right_limit:
             raise Exception('left_limit >= right_limit')
@@ -46,24 +45,28 @@ class ServoController:
     def stop(self):
         self.angle = (self._left_limit + self._right_limit)/2
         self._target = (self._left_limit + self._right_limit)/2
-        self._servo.stop()
         self._pid.reset()
+        self._servo.stop()
 
 
 if __name__ == "__main__":
     import pigpio
-    import time
+    from time import sleep
+    from parameters import servo_pid_constants
     
     raspi = pigpio.pi()
-    pid_constants = {'kp': 0.25, 'ki': 0, 'kd': 0}
-    servo_controller = ServoController(raspi, 25, pid_constants)
-    time.sleep(1)
-    for _ in range(18):
-        servo_controller.move_by(-5)
-        time.sleep(0.05)
-    for _ in range(36):
-        servo_controller.move_by(5)
-        time.sleep(0.05)
+    servo_controller = ServoController(raspi, 25, servo_pid_constants)
+    sleep(0.5)
+    servo_controller.move_by(-pi/2)
+    sleep(0.1)
+    for _ in range(10):
+        servo_controller.track()
+        sleep(0.1)
+    servo_controller.move_by(pi)
+    sleep(0.1)
+    for _ in range(20):
+        servo_controller.track()
+        sleep(0.1)
     
     servo_controller.stop()
     raspi.stop()

@@ -1,5 +1,3 @@
-import pigpio
-
 class Servo:
     """
     controls pigpio interface for a servo
@@ -24,12 +22,12 @@ if __name__ == "__main__":
     import pigpio
     import time
     
-    pi = pigpio.pi()
-    servo = Servo(pi, 25)
-    time.sleep(1)
+    raspi = pigpio.pi()
+    servo = Servo(raspi, 25)
+    time.sleep(0.5)
     for angle in range(0, 50):
         servo.move_to(angle/50.0)
         time.sleep(0.05)
     
     servo.stop()
-    pi.stop()
+    raspi.stop()

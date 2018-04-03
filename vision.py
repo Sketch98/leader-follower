@@ -2,6 +2,7 @@ import time
 
 import cv2
 from imutils.video import VideoStream
+
 from parameters import pink, resolution, min_obj_radius
 
 
