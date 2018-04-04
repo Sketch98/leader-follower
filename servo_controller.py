@@ -14,13 +14,14 @@ class ServoController:
     def __init__(self, pin, pid_constants, left_limit=-pi/2, right_limit=pi/2):
         self._servo = Servo(pin)
         self._pid = PID(pid_constants)
-        
         if left_limit >= right_limit:
             raise Exception('left_limit >= right_limit')
         self._left_limit = left_limit
         self._right_limit = right_limit
-        self.angle = (self._left_limit + self._right_limit)/2
-        self._target = self.angle
+        self._angle = (self._left_limit + self._right_limit)/2
+        self._target = self._angle
+        
+        self.angle = property(lambda: self._angle, self._move_to)
     
     def track(self):
         self.move_by(self._target - self.angle)
@@ -33,13 +34,12 @@ class ServoController:
         
         # ensure that servo moves at most by max_move
         offset = limit(offset, -max_move, max_move)
-        
-        # ensure servo doesn't move beyond limits
-        angle_dst = limit(self.angle + offset, self._left_limit, self._right_limit)
-        self.angle = angle_dst
-        self._move_to(angle_dst)
+        self.angle = self.angle + offset
     
     def _move_to(self, angle):
+        # ensure servo doesn't move beyond limits
+        angle = limit(angle, self._left_limit, self._right_limit)
+        self._angle = angle
         self._servo.move_to((angle - self._left_limit)/(self._right_limit - self._left_limit))
     
     def stop(self):
