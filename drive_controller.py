@@ -1,6 +1,6 @@
 from filter import Filter
 from motor_controller import MotorController
-from parameters import distance_between_wheels, distance_ratio, left_pins, motor_pid_constants, right_pins
+from parameters import distance_between_wheels, distance_ratio, left_pins, left_motor_pid_constants, right_motor_pid_constants, right_pins
 
 
 class DriveController:
@@ -9,8 +9,8 @@ class DriveController:
     """
     
     def __init__(self):
-        self._left_motor_controller = MotorController(0, left_pins, motor_pid_constants, 0)
-        self._right_motor_controller = MotorController(1, right_pins, motor_pid_constants, 1)
+        self._left_motor_controller = MotorController(0, left_pins, left_motor_pid_constants, 0)
+        self._right_motor_controller = MotorController(1, right_pins, right_motor_pid_constants, 1)
         self._left_filter = Filter(coefficients=tuple([float(i + 1) for i in range(10)]))
         self._right_filter = Filter(coefficients=tuple([float(i + 1) for i in range(10)]))
         self._left_vel = 0
@@ -48,10 +48,9 @@ class DriveController:
 
 
 if __name__ == '__main__':
-    import pigpio
+    from globals import raspi
     from time import sleep
     
-    raspi = pigpio.pi()
     d = DriveController()
     try:
         while True:

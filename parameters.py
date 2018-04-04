@@ -2,19 +2,21 @@ from math import pi
 
 # ------------------------------ parameters ------------------------------
 # camera stuff
-pink = ((160, 100, 120), (180, 210, 255))
+pink = ((140, 100, 100), (240, 255, 255))
 resolution = (640, 480)
 min_obj_radius = 5
 
 # pids
-servo_pid_constants = {'kp': 0.3, 'ki': 0, 'kd': 0.25}
-motor_pid_constants = {'kp': 0.00102, 'ki': 0.0178333, 'kd': 0}
-forward_pid_constants = {'kp': 1, 'ki': 0, 'kd': 0.2}
-angle_pid_constants = {'kp': 1, 'ki': 0, 'kd': 0.2}
+servo_pid_constants = {'kp': 0.3, 'ki': 0, 'kd': 0}
+left_motor_pid_constants = {'kp': 0.00107, 'ki': 0.0180333, 'kd': 0}
+right_motor_pid_constants = {'kp': 0.00102, 'ki': 0.0178333, 'kd': 0}
+forward_pid_constants = {'kp': 3, 'ki': 0, 'kd': 3}
+angle_pid_constants = {'kp': 2, 'ki': 0, 'kd': 1}
 
-target_dist_offset = 700
+target_dist_offset = 600
 small_angle = pi/36
 nav_timer_interval = 0.01
+accel_limit = 0.01
 
 button_delay = 0.3
 
@@ -34,15 +36,15 @@ current_coefficient = 0.0488
 current_time_limit = 500
 
 # also equal to the pos_dif per rev
-encoder_edges_per_rev = 192
+encoder_edges_per_rev = 192.0
 
 # robot dimensions
 # all distances in mm and angles in radians
-wheel_radius = 50  # 42
-wheel_circumference = wheel_radius*2*pi
+wheel_radius = 50.0  # 42
+wheel_circumference = wheel_radius*2.0*pi
 distance_ratio = wheel_circumference/encoder_edges_per_rev
-distance_between_wheels = 400
-max_wheel_vel = 16*wheel_circumference
+distance_between_wheels = 400.0
+max_wheel_vel = 16.0*wheel_circumference
 
 # y distance from center of wheels to center of camera servo
 camera_y_offset = 30

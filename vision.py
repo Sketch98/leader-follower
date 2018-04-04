@@ -20,8 +20,8 @@ class Vision:
         # construct a mask for the color pink, then perform a series of
         # dilations and erosions to remove any small blobs left in the mask
         mask = cv2.inRange(hsv, pink[0], pink[1])
-        mask = cv2.erode(mask, None, iterations=2)
-        mask = cv2.dilate(mask, None, iterations=2)
+        # mask = cv2.erode(mask, None, iterations=1)
+        # mask = cv2.dilate(mask, None, iterations=1)
         
         # find contours in the mask
         contours = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
@@ -38,20 +38,16 @@ class Vision:
             
             # only proceed if the radius meets a minimum size
             if radius >= min_obj_radius:
-                x = x_pix
+                x = resolution[0] - x_pix
                 y = y_pix
                 diameter = radius*2
         
         return x, y, diameter
     
     def loop(self, callback):
-        t = time.time()
         while True:
             # not using the y position of the ball in frame currently
             x, _, diameter = self._analyze_frame()
-            
-            print(1/(t - time.time()))
-            t = time.time()
             callback(x, diameter)
     
     def stop(self):

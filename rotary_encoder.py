@@ -1,3 +1,4 @@
+from globals import raspi
 import pigpio
 
 
@@ -7,8 +8,6 @@ class RotaryEncoder:
     """
     
     def __init__(self, a, b):
-        global raspi
-        
         self._a = a
         self._b = b
         
@@ -64,7 +63,6 @@ if __name__ == "__main__":
     import time
     from parameters import left_pins
     
-    raspi = pigpio.pi()
     encoder = RotaryEncoder(left_pins['a'], left_pins['b'])
     try:
         while True:

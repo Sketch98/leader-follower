@@ -2,6 +2,7 @@
 
 from time import sleep, time
 
+from globals import raspi
 import pigpio
 
 
@@ -22,7 +23,6 @@ class Ranger:
         The class is instantiated with the Pi to use and the
         gpios connected to the trigger and echo pins.
         """
-        global raspi
         self._trig = trigger
         self._echo = echo
         
@@ -67,7 +67,6 @@ class Ranger:
         """
         if self._inited:
             self._ping = False
-            global raspi
             raspi.gpio_trigger(self._trig)
             start = time()
             while not self._ping:
@@ -86,13 +85,11 @@ class Ranger:
         if self._inited:
             self._inited = False
             self._cb.cancel()
-            global raspi
             raspi.set_mode(self._trig, self._trig_mode)
             raspi.set_mode(self._echo, self._echo_mode)
 
 
 if __name__ == "__main__":
-    raspi = pigpio.pi()
     sonar = Ranger(23, 18)
     end = time() + 600.0
     

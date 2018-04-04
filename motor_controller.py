@@ -1,6 +1,6 @@
 from current_sensor import CurrentSensor
 from motor import Motor
-from parameters import max_wheel_vel
+from parameters import accel_limit, max_wheel_vel
 from pid import PID
 from rotary_encoder import RotaryEncoder
 
@@ -16,8 +16,13 @@ class MotorController:
     def adjust_motor_speed(self, target_vel, vel):
         error = (target_vel - vel)/max_wheel_vel
         speed = min(max(self._pid.calc(error), -1.0), 1.0)
-        self._motor.set_speed(speed)
+        if self._last_speed >= 0:
+            speed = min(speed, self._last_speed + accel_limit)
         self._last_speed = speed
+        if self._last_speed <= 0:
+            speed = min(speed, self._last_speed - accel_limit)
+        self._last_speed = speed
+        self._motor.set_speed(speed)
     
     def stop(self):
         self._motor.stop()

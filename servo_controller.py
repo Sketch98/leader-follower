@@ -50,13 +50,12 @@ class ServoController:
 
 
 if __name__ == "__main__":
-    import pigpio
+    from globals import raspi
     from time import sleep
     from parameters import servo_pid_constants
     
-    raspi = pigpio.pi()
     servo_controller = ServoController(25, servo_pid_constants)
-    sleep(0.5)
+    sleep(1)
     servo_controller.move_by(-pi/2)
     sleep(0.1)
     for _ in range(10):

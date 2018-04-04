@@ -28,19 +28,21 @@ class PositionSystem:
     finds the position of the ball relative to the vehicle
     """
     
-    def __init__(self):
+    def __init__(self, nav_system):
+        self._nav_system = nav_system
         self._servo_controller = ServoController(servo_pin, servo_pid_constants)
         self._dist_filter = Filter(coefficients=tuple([float(i + 1) for i in range(10)]))
         self._ball_filter = Filter(coefficients=tuple([float(i + 1) for i in range(10)]))
+        
+        self._count = 0
     
     def do_stuff(self, x, diameter):
-        global nav_system
         if x < 0:
             self._servo_controller.track()
-            nav_system.paused = True
+            self._nav_system.paused = True
             return
-        
-        nav_system.paused = False
+
+        self._nav_system.paused = False
         dist, camera_to_ball_angle = dist_angle_to_ball(x, diameter)
         vehicle_to_ball_angle = camera_to_ball_angle + self._servo_controller.angle
         
@@ -48,13 +50,11 @@ class PositionSystem:
         self._servo_controller.move_by(camera_to_ball_angle)
         
         # filter dist and angle
-        dist = self._dist_filter.queue(dist)
-        vehicle_to_ball_angle = self._ball_filter.queue(vehicle_to_ball_angle)
+        # dist = self._dist_filter.queue(dist)
+        # vehicle_to_ball_angle = self._ball_filter.queue(vehicle_to_ball_angle)
         
         # tell nav system where ball is
-        nav_system.dist_to_ball = dist
-        nav_system.angle_to_ball = vehicle_to_ball_angle
-        return
+        self._nav_system.calc_velocities(dist, vehicle_to_ball_angle)
     
     def stop(self):
         self._servo_controller.stop()

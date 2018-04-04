@@ -1,5 +1,6 @@
 import pigpio
 
+from globals import raspi
 from parameters import motor_pwm_range
 
 
@@ -9,20 +10,17 @@ class Motor:
         self._dir_pin = dir_pin
         self._forward = forward
         
-        global raspi
         raspi.set_mode(pwm_pin, pigpio.OUTPUT)
         raspi.set_mode(dir_pin, pigpio.OUTPUT)
         raspi.set_PWM_range(pwm_pin, motor_pwm_range)
         self._set_pwm(0)
     
     def _set_dir(self, direction):
-        global raspi
         assert direction in [0, 1], 'invalid direction = {} in _set_dir'.format(direction)
         raspi.write(self._dir_pin, direction)
     
     def _set_pwm(self, pwm):
-        global raspi
-        pwm = max(min(pwm, 5000), -5000)
+        pwm = pwm
         assert motor_pwm_range >= pwm >= 0, 'invalid pwm = {} in _set_pwm'.format(pwm)
         raspi.set_PWM_dutycycle(self._pwm_pin, int(pwm))
     
@@ -42,7 +40,6 @@ if __name__ == "__main__":
     from rotary_encoder import RotaryEncoder
     from parameters import left_pins, right_pins
     
-    raspi = pigpio.pi()
     left_motor = Motor(left_pins['pwm'], left_pins['dir'], 0)
     right_motor = Motor(right_pins['pwm'], right_pins['dir'], 1)
     left_enc = RotaryEncoder(left_pins['a'], left_pins['b'])
