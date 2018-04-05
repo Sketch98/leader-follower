@@ -25,11 +25,11 @@ class NavSystem:
     
     def calc_velocities(self, dist, angle):
         if abs(angle) > pi/4:
-            self.forward_velocity = 0
-            self.angular_velocity = self._turn_pid.calc(angle)*1.5
+            self.forward_velocity = self._forward_pid.calc((dist - target_dist_offset)*0.1)
+            self.angular_velocity = self._turn_pid.calc(angle*4)
         else:
             self.forward_velocity = self._forward_pid.calc(dist - target_dist_offset)
-            self.angular_velocity = self._turn_pid.calc(angle)
+            self.angular_velocity = self._turn_pid.calc(angle*0.5)
     
     def _timer_callback(self):
         self._drive_controller.check_current()

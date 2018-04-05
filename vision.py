@@ -38,7 +38,7 @@ class Vision:
             
             # only proceed if the radius meets a minimum size
             if radius >= min_obj_radius:
-                x = resolution[0] - x_pix
+                x = x_pix
                 y = y_pix
                 diameter = radius*2
         

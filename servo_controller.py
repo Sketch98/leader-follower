@@ -29,6 +29,10 @@ class ServoController:
         # set target in case ball goes missing
         self._target = self.angle + offset
         
+        # stop tiny oscillations
+        if abs(offset) < 0.07:
+            offset = 0.0
+        
         offset = self._pid.calc(offset)
         
         # ensure that servo moves at most by max_move

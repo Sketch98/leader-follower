@@ -8,10 +8,10 @@ min_obj_radius = 5
 
 # pids
 servo_pid_constants = {'kp': 0.3, 'ki': 0, 'kd': 0}
-left_motor_pid_constants = {'kp': 0.00107, 'ki': 0.0180333, 'kd': 0}
+left_motor_pid_constants = {'kp': 0.00110, 'ki': 0.0178333, 'kd': 0}
 right_motor_pid_constants = {'kp': 0.00102, 'ki': 0.0178333, 'kd': 0}
-forward_pid_constants = {'kp': 3, 'ki': 0, 'kd': 3}
-angle_pid_constants = {'kp': 2, 'ki': 0, 'kd': 1}
+forward_pid_constants = {'kp': 0.2, 'ki': 0.05, 'kd': 1}
+angle_pid_constants = {'kp': 0.5, 'ki': 0, 'kd': 0}
 
 target_dist_offset = 600
 small_angle = pi/36
@@ -26,7 +26,7 @@ servo_pin = 25
 left_pins = {'pwm': 6, 'dir': 5, 'a': 17, 'b': 27}
 right_pins = {'pwm': 26, 'dir': 13, 'a': 23, 'b': 18}
 
-frame_rates = {(320, 240): 33, (640, 480): 12, (1280, 720): 5, (1920, 1080): 2}
+frame_rates = {(320, 240): 40, (640, 480): 16, (1280, 720): 8, (1920, 1080): 3}
 frame_rate = frame_rates[resolution]
 servo_speed = 1.67
 max_move = 2*pi/servo_speed/frame_rate

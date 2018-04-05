@@ -41,10 +41,11 @@ class PositionSystem:
             self._servo_controller.track()
             self._nav_system.paused = True
             return
-
+        
         self._nav_system.paused = False
         dist, camera_to_ball_angle = dist_angle_to_ball(x, diameter)
         vehicle_to_ball_angle = camera_to_ball_angle + self._servo_controller.angle
+        print('x={:.3f} s={:.3f} c={:.3f} v={:.3f}'.format(x, self._servo_controller.angle, camera_to_ball_angle, vehicle_to_ball_angle))
         
         # move servo immediately
         self._servo_controller.move_by(camera_to_ball_angle)
