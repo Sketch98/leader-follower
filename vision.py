@@ -3,25 +3,25 @@ import time
 import cv2
 from imutils.video import VideoStream
 
-from parameters import pink, resolution, min_obj_radius
+from parameters import min_obj_radius, pink, resolution
 
 
 class Vision:
     def __init__(self):
         # initialize the video stream and allow the camera sensor to warm up
-        self.vs = VideoStream(usePiCamera=True, resolution=resolution).start()
+        self._vs = VideoStream(usePiCamera=True, resolution=resolution).start()
         time.sleep(2.0)
     
     def _analyze_frame(self):
         # grab the current frame and convert it to the HSV color space
-        frame = self.vs.read()
+        frame = self._vs.read()
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         
         # construct a mask for the color pink, then perform a series of
         # dilations and erosions to remove any small blobs left in the mask
         mask = cv2.inRange(hsv, pink[0], pink[1])
-        mask = cv2.erode(mask, None, iterations=2)
-        mask = cv2.dilate(mask, None, iterations=2)
+        # mask = cv2.erode(mask, None, iterations=1)
+        # mask = cv2.dilate(mask, None, iterations=1)
         
         # find contours in the mask
         contours = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
@@ -45,14 +45,10 @@ class Vision:
         return x, y, diameter
     
     def loop(self, callback):
-        t = time.time()
         while True:
             # not using the y position of the ball in frame currently
             x, _, diameter = self._analyze_frame()
-            
-            print(1/(t - time.time()))
-            t = time.time()
             callback(x, diameter)
     
     def stop(self):
-        self.vs.stop()
+        self._vs.stop()

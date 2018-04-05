@@ -6,27 +6,26 @@ class RepeatedTimer:
     """Repeat `func` every `interval` seconds."""
     
     def __init__(self, interval, func):
-        self.interval = interval
-        self.func = func
-        self.last_time = 0
-        self.event = Event()
-        self.thread = Thread(target=self._target)
+        self._interval = interval
+        self._func = func
+        self._last_time = 0
+        self._event = Event()
+        self._thread = Thread(target=self._target)
     
     def _target(self):
-        # use self._time instead of self.interval for exact timing
-        while not self.event.wait(self.interval):
-            self.func(interval=self.interval)
+        while not self._event.wait(self._interval):  # self._time()):
+            self._func()
     
     def _time(self):
-        time_elapsed = time.time() - self.last_time
-        assert self.interval > time_elapsed, 'drive_system loop took {}s which is longer than longer than' \
-                                             'the allowed interval {}s'.format(time_elapsed, self.interval)
-        return self.interval - time_elapsed
+        time_elapsed = time.time() - self._last_time
+        assert self._interval > time_elapsed, 'drive_system loop took {}s which is longer than longer than' \
+                                              'the allowed interval {}s'.format(time_elapsed, self._interval)
+        return self._interval - time_elapsed
     
     def start(self):
-        self.last_time = time.time()
-        self.thread.start()
+        self._last_time = time.time()
+        self._thread.start()
     
     def stop(self):
-        self.event.set()
-        self.thread.join()
+        self._event.set()
+        self._thread.join()

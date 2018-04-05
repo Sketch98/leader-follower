@@ -8,23 +8,23 @@ class Button:
     Waits for a button to be pressed
     """
     
-    def __init__(self, raspi, pin, callback):
-        self.raspi = raspi
-        self.raspi.set_mode(pin, pigpio.INPUT)
-        self.cb = self.raspi.callback(pin, pigpio.RISING_EDGE, self._press)
+    def __init__(self, pin, callback):
+        global raspi
+        raspi.set_mode(pin, pigpio.INPUT)
+        self._cb = raspi.callback(pin, pigpio.RISING_EDGE, self._press)
         
-        self.callback = callback
-        self.last_time = 0.0
+        self._callback = callback
+        self._last_time = 0.0
     
     def _press(self, gpio, level, tick):
         # convert ns to s
         time = tick/1000000.0
-        if time - self.last_time >= button_delay:
-            self.last_time = time
-            self.callback()
+        if time - self._last_time >= button_delay:
+            self._last_time = time
+            self._callback()
     
     def stop(self):
-        self.cb.cancel()
+        self._cb.cancel()
 
 
 if __name__ == '__main__':
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     
     
     raspi = pigpio.pi()
-    btn = Button(raspi, 12, callback)
+    btn = Button(12, callback)
     try:
         while True:
             sleep(1)

@@ -1,18 +1,18 @@
-import pigpio
+from globals import raspi
 
 from nav_system import NavSystem
 from position_system import PositionSystem
 from vision import Vision
 
-raspi = pigpio.pi()
-v = Vision()
-n = NavSystem(raspi)
-p = PositionSystem(raspi, n)
+vision = Vision()
+nav_system = NavSystem()
+position_system = PositionSystem(nav_system)
 
 try:
-    n.start()
-    v.loop(p.do_stuff)
+    nav_system.start()
+    vision.loop(position_system.do_stuff)
 except KeyboardInterrupt:
-    n.stop()
-    v.stop()
-    p.stop()
+    nav_system.stop()
+    vision.stop()
+    position_system.stop()
+    raspi.stop()

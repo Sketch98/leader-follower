@@ -1,8 +1,6 @@
 from filter import Filter
-from mcp3008 import MCP3008
 from motor_controller import MotorController
-from parameters import distance_between_wheels, distance_ratio, left_pins, motor_pid_constants, \
-    right_pins
+from parameters import distance_between_wheels, distance_ratio, left_pins, left_motor_pid_constants, right_motor_pid_constants, right_pins
 
 
 class DriveController:
@@ -10,10 +8,9 @@ class DriveController:
     implement forward and reverse kinematics of the robot's motors
     """
     
-    def __init__(self, raspi):
-        _mcp = MCP3008()
-        self._left_motor_controller = MotorController(raspi, _mcp, 0, left_pins, motor_pid_constants, forward=0)
-        self._right_motor_controller = MotorController(raspi, _mcp, 1, right_pins, motor_pid_constants, forward=1)
+    def __init__(self):
+        self._left_motor_controller = MotorController(0, left_pins, left_motor_pid_constants, 0)
+        self._right_motor_controller = MotorController(1, right_pins, right_motor_pid_constants, 1)
         self._left_filter = Filter(coefficients=tuple([float(i + 1) for i in range(10)]))
         self._right_filter = Filter(coefficients=tuple([float(i + 1) for i in range(10)]))
         self._left_vel = 0
@@ -51,11 +48,10 @@ class DriveController:
 
 
 if __name__ == '__main__':
-    import pigpio
+    from globals import raspi
     from time import sleep
     
-    raspi = pigpio.pi()
-    d = DriveController(raspi)
+    d = DriveController()
     try:
         while True:
             d.update_motors(100, 0)

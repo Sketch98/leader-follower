@@ -1,3 +1,4 @@
+from globals import raspi
 import pigpio
 
 
@@ -6,76 +7,67 @@ class RotaryEncoder:
     decodes quadrature signal from a rotary encoder
     """
     
-    def __init__(self, raspi, a, b):
+    def __init__(self, a, b):
+        self._a = a
+        self._b = b
         
-        self.raspi = raspi
-        self.gpio_a = a
-        self.gpio_b = b
-        
-        self.last_gpio = None
-        self.last_level = None
+        self._last_gpio = None
+        self._last_level = None
+        self._last_pos = 0
         self.pos = 0
-        self.last_pos = 0
         
-        self.raspi.set_mode(a, pigpio.INPUT)
-        self.raspi.set_mode(b, pigpio.INPUT)
+        raspi.set_mode(a, pigpio.INPUT)
+        raspi.set_mode(b, pigpio.INPUT)
         
-        self.raspi.set_pull_up_down(a, pigpio.PUD_UP)
-        self.raspi.set_pull_up_down(b, pigpio.PUD_UP)
+        raspi.set_pull_up_down(a, pigpio.PUD_UP)
+        raspi.set_pull_up_down(b, pigpio.PUD_UP)
         
-        self.lev_a = self.raspi.read(a)
-        self.lev_b = self.raspi.read(b)
+        self._lev_a = raspi.read(a)
+        self._lev_b = raspi.read(b)
         
-        self.cb_a = self.raspi.callback(a, pigpio.EITHER_EDGE, self._pulse)
-        self.cb_b = self.raspi.callback(b, pigpio.EITHER_EDGE, self._pulse)
+        self._cb_a = raspi.callback(a, pigpio.EITHER_EDGE, self._pulse)
+        self._cb_b = raspi.callback(b, pigpio.EITHER_EDGE, self._pulse)
     
     def _pulse(self, gpio, level, tick):
         # debounce
-        if gpio == self.last_gpio and level == self.last_level:
+        if gpio == self._last_gpio and level == self._last_level:
             return
-        self.last_gpio = gpio
-        self.last_level = level
+        self._last_gpio = gpio
+        self._last_level = level
         
-        if gpio == self.gpio_a:
-            self.lev_a = level
-            if level == self.lev_b:
+        if gpio == self._a:
+            self._lev_a = level
+            if level == self._lev_b:
                 self.pos += 1
             else:
                 self.pos -= 1
-        elif gpio == self.gpio_b:
-            self.lev_b = level
-            if level == self.lev_a:
+        elif gpio == self._b:
+            self._lev_b = level
+            if level == self._lev_a:
                 self.pos -= 1
             else:
                 self.pos += 1
-    
-    def zero(self):
-        self.pos = 0
-    
-    def get_pos(self):
-        return self.pos
     
     def get_pos_dif(self):
-        pos = self.get_pos()
-        pos_dif = pos - self.last_pos
-        self.last_pos = pos
+        pos_dif = self.pos - self._last_pos
+        self._last_pos += pos_dif
         return pos_dif
     
     def stop(self):
         # Cancel the rotary encoder callback
-        self.cb_a.cancel()
-        self.cb_b.cancel()
+        self._cb_a.cancel()
+        self._cb_b.cancel()
 
 
 if __name__ == "__main__":
     import time
+    from parameters import left_pins
     
-    raspi = pigpio.pi()
-    encoder = RotaryEncoder(raspi, 17, 27)
+    encoder = RotaryEncoder(left_pins['a'], left_pins['b'])
     try:
         while True:
             print(encoder.get_pos_dif())
-            print(encoder.get_pos())
+            print(encoder.pos)
             time.sleep(0.01)
     except KeyboardInterrupt:
         encoder.stop()
