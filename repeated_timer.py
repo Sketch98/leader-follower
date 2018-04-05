@@ -13,11 +13,12 @@ class RepeatedTimer:
         self._thread = Thread(target=self._target)
     
     def _target(self):
-        while not self._event.wait(self._interval):  # self._time()):
+        while not self._event.wait(self._time()):
             self._func()
     
     def _time(self):
         time_elapsed = time.time() - self._last_time
+        self._last_time += time_elapsed
         assert self._interval > time_elapsed, 'drive_system loop took {}s which is longer than longer than' \
                                               'the allowed interval {}s'.format(time_elapsed, self._interval)
         return self._interval - time_elapsed
