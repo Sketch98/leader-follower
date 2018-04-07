@@ -1,7 +1,6 @@
 from globals import raspi
 import pigpio
 
-
 a = (0, 0.25, 0.5, 0.75, 1)
 b = (0.08, 0.35, 0.6, 0.78, 0.98)
 

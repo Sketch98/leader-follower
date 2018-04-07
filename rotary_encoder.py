@@ -1,5 +1,6 @@
-from globals import raspi
 import pigpio
+
+from globals import raspi
 
 
 class RotaryEncoder:

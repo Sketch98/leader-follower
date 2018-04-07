@@ -13,7 +13,7 @@ class RepeatedTimer:
         self._thread = Thread(target=self._target)
     
     def _target(self):
-        while not self._event.wait(self._time()):
+        while not self._event.wait(self._interval):  # self._time()):
             self._func()
     
     def _time(self):

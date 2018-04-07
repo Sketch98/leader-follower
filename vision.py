@@ -1,16 +1,23 @@
-import time
+from math import asin, tan
 
 import cv2
 from imutils.video import VideoStream
 
-from parameters import min_obj_radius, pink, resolution
+from parameters import min_obj_radius, pink, resolution, camera_dist_offset
+from timer import Timer
+
+
+def angle_to_pixel(x_pix):
+    # corrects for camera's lens projecting curved light onto a flat sensor
+    angle = asin(0.8643*(x_pix/resolution[0] - 0.5))
+    return angle
 
 
 class Vision:
     def __init__(self):
         # initialize the video stream and allow the camera sensor to warm up
         self._vs = VideoStream(usePiCamera=True, resolution=resolution).start()
-        time.sleep(2.0)
+        self._timer = Timer()
     
     def _analyze_frame(self):
         # grab the current frame and convert it to the HSV color space
@@ -44,11 +51,25 @@ class Vision:
         
         return x, y, diameter
     
-    def loop(self, callback):
-        while True:
-            # not using the y position of the ball in frame currently
-            x, _, diameter = self._analyze_frame()
-            callback(x, diameter)
+    def dist_angle_to_ball(self):
+        """
+        finds the angles to the left and right sides of the ball.
+        it uses that to estimate the distance and angle to the ball.
+        """
+        # not using the y position of the ball in frame currently
+        x_pix, _, diameter = self._analyze_frame()
+        
+        """
+        return None if ball not in frame
+        """
+        if x_pix < 0:
+            return None, None
+        
+        left_angle = angle_to_pixel(x_pix - diameter/2.0)
+        right_angle = angle_to_pixel(x_pix + diameter/2.0)
+        ball_angle = (right_angle + left_angle)/2
+        dist = abs(33.1/tan(right_angle - left_angle)) + camera_dist_offset
+        return dist, ball_angle
     
     def stop(self):
         self._vs.stop()

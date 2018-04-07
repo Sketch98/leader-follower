@@ -1,6 +1,6 @@
 import pigpio
 
-from parameters import button_delay
+from parameters import button_debounce_delay
 
 
 class Button:
@@ -19,7 +19,7 @@ class Button:
     def _press(self, gpio, level, tick):
         # convert ns to s
         time = tick/1000000.0
-        if time - self._last_time >= button_delay:
+        if time - self._last_time >= button_debounce_delay:
             self._last_time = time
             self._callback()
     

@@ -1,6 +1,6 @@
 from math import pi
 
-from parameters import max_move
+from parameters import max_move, servo_dead_zone
 from pid import PID
 from servo import Servo
 
@@ -31,7 +31,7 @@ class ServoController:
         self._target = self.angle + offset
         
         # stop tiny oscillations
-        if abs(offset) < 0.07:
+        if abs(offset) < servo_dead_zone:
             offset = 0.0
         
         offset = self._pid.calc(offset)

@@ -2,8 +2,9 @@
 
 from time import sleep, time
 
-from globals import raspi
 import pigpio
+
+from globals import raspi
 
 
 class Ranger:

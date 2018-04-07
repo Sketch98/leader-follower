@@ -1,6 +1,7 @@
 from filter import Filter
 from motor_controller import MotorController
-from parameters import distance_between_wheels, distance_ratio, left_pins, left_motor_pid_constants, right_motor_pid_constants, right_pins
+from parameters import distance_between_wheels, distance_ratio, left_pins, left_motor_pid_constants, \
+    right_motor_pid_constants, right_pins
 
 
 class DriveController:
