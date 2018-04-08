@@ -1,7 +1,8 @@
-from filter import Filter
+# from filter import Filter
+from filter import DoubleExponentialFilter
 from motor_controller import MotorController
 from parameters import distance_between_wheels, distance_ratio, left_pins, left_motor_pid_constants, \
-    right_motor_pid_constants, right_pins
+    right_motor_pid_constants, right_pins, smoothing_factor, trend_smoothing_factor
 
 
 class DriveController:
@@ -12,8 +13,8 @@ class DriveController:
     def __init__(self):
         self._left_motor_controller = MotorController(0, left_pins, left_motor_pid_constants, 0)
         self._right_motor_controller = MotorController(1, right_pins, right_motor_pid_constants, 1)
-        self._left_filter = Filter(coefficients=tuple([float(i + 1) for i in range(10)]))
-        self._right_filter = Filter(coefficients=tuple([float(i + 1) for i in range(10)]))
+        self._left_filter =  DoubleExponentialFilter(smoothing_factor, trend_smoothing_factor)
+        self._right_filter = DoubleExponentialFilter(smoothing_factor, trend_smoothing_factor)
         self._left_vel = 0
         self._right_vel = 0
     
@@ -23,8 +24,8 @@ class DriveController:
         right_pos_dif = self._right_motor_controller.get_pos_dif()*distance_ratio
         
         # average 10 samples and update wheel velocities
-        left_pos_dif = self._left_filter.queue(left_pos_dif)
-        right_pos_dif = self._right_filter.queue(right_pos_dif)
+        left_pos_dif = self._left_filter.filter(left_pos_dif)
+        right_pos_dif = self._right_filter.filter(right_pos_dif)
         self._left_vel = left_pos_dif/interval
         self._right_vel = right_pos_dif/interval
         

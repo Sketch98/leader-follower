@@ -25,7 +25,7 @@ try:
         # search for ball
         if search_system.in_search_mode(camera_to_ball_angle):
             servo_controller.move_by(search_system.search_servo(servo_controller.angle))
-            nav_system.override_velocities(0.0, search_system.search_motors())
+            nav_system.override_velocities(0.0, search_system.search_angular_speed())
             continue
         
         # if ball missing and not searching track servo and slow to a stop
@@ -50,5 +50,6 @@ except KeyboardInterrupt:
 finally:
     nav_system.stop()
     servo_controller.stop()
+    timer.close()
     vision.stop()
     raspi.stop()

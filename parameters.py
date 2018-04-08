@@ -55,15 +55,20 @@ count_before_search = 30
 acceptable_angle_error = 0.15
 # speed that the servo sweeps at when searching
 # the value does not correspond to any physical speed. its just a scalar
-sweep_speed = 0.3
+sweep_speed = 0.1
 # angular velocity that the robot spins at when in searching's spin mode
 spin_speed = 1.0
+# number of times the servo will sweep from one side to another before it switches to the robot spinning
+sweeps_before_spin = 4
 
 # ----- miscellaneous -----
 # minimum time in between presses of a button
 button_debounce_delay = 0.3
 # movements smaller than the dead zone will be treated as 0 to stop shaking back and forth
-servo_dead_zone = 0.07
+servo_dead_band = 0.07
+# factors for smooting encoder input
+smoothing_factor = 1.0
+trend_smoothing_factor = 1.0
 
 # --------------------------------------------------------------
 # ----------------------- constants ----------------------------

@@ -1,6 +1,6 @@
 from math import pi
 
-from parameters import max_move, servo_dead_zone
+from parameters import max_move, servo_dead_band
 from pid import PID
 from servo import Servo
 
@@ -13,15 +13,13 @@ def limit(val, lower_limit, upper_limit):
 class ServoController:
     def __init__(self, pin, pid_constants, left_limit=-pi/2, right_limit=pi/2):
         self._servo = Servo(pin)
-        self._pid = PID(pid_constants)
+        self._pid = PID(pid_constants, servo_dead_band)
         if left_limit >= right_limit:
             raise Exception('left_limit >= right_limit')
         self._left_limit = left_limit
         self._right_limit = right_limit
-        self._angle = (self._left_limit + self._right_limit)/2
-        self._target = self._angle
-        
-        self.angle = property(lambda: self._angle, self._move_to)
+        self.angle = (self._left_limit + self._right_limit)/2
+        self._target = self.angle
     
     def track(self):
         self.move_by(self._target - self.angle)
@@ -30,24 +28,20 @@ class ServoController:
         # set target in case ball goes missing
         self._target = self.angle + offset
         
-        # stop tiny oscillations
-        if abs(offset) < servo_dead_zone:
-            offset = 0.0
-        
         offset = self._pid.calc(offset)
         
         # ensure that servo moves at most by max_move
         offset = limit(offset, -max_move, max_move)
-        self.angle = self.angle + offset
+        self._move_to(self.angle + offset)
     
     def _move_to(self, angle):
         # ensure servo doesn't move beyond limits
         angle = limit(angle, self._left_limit, self._right_limit)
-        self._angle = angle
+        self.angle = angle
         self._servo.move_to((angle - self._left_limit)/(self._right_limit - self._left_limit))
     
     def stop(self):
-        self.angle = (self._left_limit + self._right_limit)/2
+        self._move_to((self._left_limit + self._right_limit)/2)
         self._target = (self._left_limit + self._right_limit)/2
         self._pid.reset()
         self._servo.stop()

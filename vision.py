@@ -1,10 +1,10 @@
 from math import asin, tan
+from time import sleep
 
 import cv2
 from imutils.video import VideoStream
 
 from parameters import min_obj_radius, pink, resolution, camera_dist_offset
-from timer import Timer
 
 
 def angle_to_pixel(x_pix):
@@ -17,7 +17,7 @@ class Vision:
     def __init__(self):
         # initialize the video stream and allow the camera sensor to warm up
         self._vs = VideoStream(usePiCamera=True, resolution=resolution).start()
-        self._timer = Timer()
+        sleep(2)
     
     def _analyze_frame(self):
         # grab the current frame and convert it to the HSV color space

@@ -1,8 +1,7 @@
 from enum import Enum
 from math import pi
 
-from parameters import count_before_search, sweep_speed, spin_speed
-
+from parameters import acceptable_angle_error, count_before_search, sweep_speed, spin_speed, sweeps_before_spin
 
 class SearchMode(Enum):
     left = 'left'
@@ -27,6 +26,7 @@ class SearchSystem():
         self._searching = False
         self._mode = SearchMode.left
         self._last_seen_angle = 0
+        self._num_sweeps = 0
     
     def in_search_mode_simple(self, ball_angle):
         # ball_angle is None when the ball isn't on screen, so we need to search for it
@@ -35,6 +35,7 @@ class SearchSystem():
             # otherwise we don't want to modify direction because it needs to sweep back and forth
             # which requires it to be modified elsewhere
             if not self._searching:
+                self._num_sweeps = 0
                 self._mode = SearchMode.left if self._last_seen_angle < 0 else SearchMode.right
                 self._searching = True
         else:
@@ -55,14 +56,17 @@ class SearchSystem():
         
         # enter search mode if reached count_before_search
         if self._count == count_before_search:
-            self._mode = 'left' if self._last_seen_angle < 0 else 'right'
+            self._mode = SearchMode.left if self._last_seen_angle < 0 else SearchMode.right
             self._searching = True
         return self._searching
     
     def reached_target_angle(self, servo_angle):
         lower_bound = target_angle[self._mode] - acceptable_angle_error
         upper_bound = target_angle[self._mode] + acceptable_angle_error
-        return lower_bound <= servo_angle <= upper_bound
+        if lower_bound <= servo_angle <= upper_bound:
+            self._num_sweeps += 1
+            return True
+        return False
     
     def search_servo(self, servo_angle):
         # TODO: need way to change from left right sweep to center then spin
@@ -70,17 +74,23 @@ class SearchSystem():
             # check if reached destination
             if self.reached_target_angle(servo_angle):
                 self._mode = SearchMode.right
+                # switch to center if reached num_sweeps
+                if self._num_sweeps >= sweeps_before_spin:
+                    self._mode = SearchMode.center
                 return self.search_servo(servo_angle)
             # sweep left (negative)
-            return servo_angle - sweep_speed
+            return -sweep_speed
         
         elif self._mode == SearchMode.right:
             # check if reached destination
             if self.reached_target_angle(servo_angle):
                 self._mode = SearchMode.left
+                # switch to center if reached num_sweeps
+                if self._num_sweeps >= sweeps_before_spin:
+                    self._mode = SearchMode.center
                 return self.search_servo(servo_angle)
             # sweep right (positive)
-            return servo_angle + sweep_speed
+            return sweep_speed
         
         elif self._mode == SearchMode.center:
             if self.reached_target_angle(servo_angle):
@@ -93,7 +103,7 @@ class SearchSystem():
             # keep servo in center then spin robot
             return -servo_angle
     
-    def search_motors(self):
+    def search_angular_speed(self):
         if self._mode == SearchMode.left:
             return 0.0
         elif self._mode == SearchMode.right:

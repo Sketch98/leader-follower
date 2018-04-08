@@ -41,18 +41,17 @@ class NavSystem:
     
     def _timer_callback(self):
         self._drive_controller.check_current()
-        
+
         # calculate time since encoders were last read
         interval = time() - self._last_time
-        self._last_time = time()
+        self._last_time += interval
         dist, angle = self._drive_controller.read_encoders(interval)
-        
+
         # if lost ball slow to a stop
         if self.paused:
             self._drive_controller.update_motors(0.0, 0.0)
             return
-        
-        self._dead_reckon(dist, angle)
+        # self._dead_reckon(dist, angle)
         
         self._drive_controller.update_motors(self.forward_velocity, self.angular_velocity)
     
@@ -66,6 +65,7 @@ class NavSystem:
         self._dead_reckon(dist/2, angle/2)
     
     def start(self):
+        self._last_time = time()
         self._repeated_timer.start()
     
     def stop(self):
