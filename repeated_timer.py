@@ -11,12 +11,12 @@ class RepeatedTimer:
         self._last_time = 0
         self._event = Event()
         self._thread = Thread(target=self._target)
-        self._thread.daemon = True
     
     def _target(self):
         while not self._event.wait(self._time()):
-            self._last_time = time()
-            self._func()
+            time_elapsed = time() - self._last_time
+            self._last_time += time_elapsed
+            self._func(time_elapsed)
     
     def _time(self):
         time_elapsed = time() - self._last_time

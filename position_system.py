@@ -6,8 +6,8 @@ from position import Position, ZERO_POS
 class PositionSystem:
     
     def __init__(self):
-        self._dist_filter = Filter(coefficients=tuple([float(i + 1) for i in range(5)]))
-        self._angle_filter = Filter(coefficients=tuple([float(i + 1) for i in range(5)]))
+        # self._move_dist_filter = Filter(coefficients=tuple([float(i + 1) for i in range(5)]))
+        # self._heading_filter = Filter(coefficients=tuple([float(i + 1) for i in range(5)]))
         
         self.last_ball_loc = ZERO_POS
     
@@ -24,8 +24,8 @@ class PositionSystem:
         ball_move_dist, ball_heading = self.last_ball_loc.relative_dist_angle_to(abs_ball_pos)
         self.last_ball_loc = abs_ball_pos
         
-        # ball_move_dist = self._dist_filter.queue(ball_move_dist)
-        # ball_heading = self._dist_filter.queue(ball_heading)
+        # ball_move_dist = self._move_dist_filter.queue(ball_move_dist)
+        # ball_heading = self._heading_filter.queue(ball_heading)
         
         # find the relative position of the vehicle from the ball's pov
         rel_pos_from_ball_pov = ZERO_POS.pos_from_dist_angle(dist_to_ball, angle_to_ball - ball_heading)

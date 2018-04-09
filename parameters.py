@@ -39,7 +39,7 @@ angle_pid_constants = {
 
 # ----- navigation -----
 # the distance the vehicle will aim to stay from the ball
-target_dist_offset = 600
+target_ball_dist = 600
 # when estimating the vehicles movements we use a point and shoot method which estimates a turn as a zero-radius turn
 # and forward movement. this only works if the turns are kept small so we recursively split up large turns into many
 # small turns with angles less than the parameter 'small_angle'
