@@ -1,8 +1,8 @@
 from math import pi
-from time import time
 
 from drive_controller import DriveController
-from parameters import angle_pid_constants, forward_pid_constants, nav_timer_interval, small_angle, target_ball_dist
+from parameters import angle_pid_constants, forward_pid_constants, \
+    nav_timer_interval, small_angle, target_ball_dist
 from pid import PID
 from position import ZERO_POS
 from repeated_timer import RepeatedTimer
@@ -15,7 +15,8 @@ class NavSystem:
         
         self._forward_pid = PID(forward_pid_constants)
         self._turn_pid = PID(angle_pid_constants)
-        self._repeated_timer = RepeatedTimer(nav_timer_interval, self._timer_callback)
+        self._repeated_timer = RepeatedTimer(nav_timer_interval,
+                                             self._timer_callback)
         
         self.pos_heading = (ZERO_POS, 0.0)
         self.dist_to_ball = target_ball_dist
@@ -31,13 +32,15 @@ class NavSystem:
         self.forward_velocity = forward
         self.angular_velocity = angular
     
-    def calc_velocities(self, dist, angle):
+    def calc_velocities(self, dist, angle, time_elapsed):
         if abs(angle) > pi/4:
-            self.forward_velocity = self._forward_pid.calc((dist - target_ball_dist)*0.1)
-            self.angular_velocity = self._turn_pid.calc(angle*4)
+            self.forward_velocity = self._forward_pid.calc(
+                (dist - target_ball_dist)*0.1, time_elapsed)
+            self.angular_velocity = self._turn_pid.calc(angle*4, time_elapsed)
         else:
-            self.forward_velocity = self._forward_pid.calc(dist - target_ball_dist)
-            self.angular_velocity = self._turn_pid.calc(angle*0.5)
+            self.forward_velocity = self._forward_pid.calc(
+                dist - target_ball_dist, time_elapsed)
+            self.angular_velocity = self._turn_pid.calc(angle*0.5, time_elapsed)
     
     def update_angle_to_ball(self, angle):
         self.angle_to_ball = angle
@@ -45,13 +48,17 @@ class NavSystem:
     def dead_reckon_angle(self, turn_angle):
         self.angle_to_ball -= turn_angle
     
-    def calc_velocities_2(self):
+    def calc_velocities_2(self, time_elapsed):
         if abs(self.angle_to_ball) > pi/4:
-            self.forward_velocity = self._forward_pid.calc((self.dist_to_ball - target_ball_dist)*0.1)
-            self.angular_velocity = self._turn_pid.calc(self.angle_to_ball*4)
+            self.forward_velocity = self._forward_pid.calc(
+                (self.dist_to_ball - target_ball_dist)*0.1, time_elapsed)
+            self.angular_velocity = self._turn_pid.calc(self.angle_to_ball*4,
+                                                        time_elapsed)
         else:
-            self.forward_velocity = self._forward_pid.calc(self.dist_to_ball - target_ball_dist)
-            self.angular_velocity = self._turn_pid.calc(self.angle_to_ball*0.5)
+            self.forward_velocity = self._forward_pid.calc(
+                self.dist_to_ball - target_ball_dist, time_elapsed)
+            self.angular_velocity = self._turn_pid.calc(self.angle_to_ball*0.5,
+                                                        time_elapsed)
     
     def _timer_callback(self, time_elapsed):
         # self._drive_controller.check_current()
@@ -62,11 +69,13 @@ class NavSystem:
         # self.dead_reckon_angle(angle)
         # if lost ball slow to a stop
         if self.paused:
-            self._drive_controller.update_motors(0.0, 0.0)
+            self._drive_controller.update_motors(0.0, 0.0, time_elapsed)
             return
-        # self._dead_reckon(dist, angle)
+        self._dead_reckon(dist, angle)
         
-        self._drive_controller.update_motors(self.forward_velocity, self.angular_velocity)
+        self._drive_controller.update_motors(self.forward_velocity,
+                                             self.angular_velocity,
+                                             time_elapsed)
     
     def _dead_reckon(self, dist, angle):
         if abs(angle) <= small_angle:
@@ -78,7 +87,6 @@ class NavSystem:
         self._dead_reckon(dist/2, angle/2)
     
     def start(self):
-        self._last_time = time()
         self._repeated_timer.start()
     
     def stop(self):
