@@ -13,9 +13,9 @@ class MotorController:
         self._pid = PID(pid_constants)
         self._last_speed = 0.0
     
-    def adjust_motor_speed(self, target_vel, vel):
+    def adjust_motor_speed(self, target_vel, vel, time_elapsed):
         error = (target_vel - vel)/max_wheel_vel
-        speed = min(max(self._pid.calc(error), -1.0), 1.0)
+        speed = min(max(self._pid.calc(error, time_elapsed), -1.0), 1.0)
         self._last_speed = speed
         self._motor.set_speed(speed)
     

@@ -6,7 +6,7 @@ class LogDecorator:
     
     def __call__(self, func):
         @wraps(func)
-        def decorated(*args, kwargs):
+        def decorated(*args, **kwargs):
             ret = func(*args, **kwargs)
             self.file.write('{}\n'.format(ret))
             return ret

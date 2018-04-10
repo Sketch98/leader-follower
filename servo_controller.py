@@ -24,11 +24,11 @@ class ServoController:
     def track(self):
         self.move_by(self._target - self.angle)
     
-    def move_by(self, offset):
+    def move_by(self, offset, time_elapsed):
         # set target in case ball goes missing
         self._target = self.angle + offset
         
-        offset = self._pid.calc(offset)
+        offset = self._pid.calc(offset, time_elapsed)
         
         # ensure that servo moves at most by max_move
         offset = limit(offset, -max_move, max_move)

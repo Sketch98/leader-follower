@@ -7,16 +7,16 @@ class PID:
         self._last_error = 0
         self._dead_band = dead_band
     
-    def calc(self, error):
+    def calc(self, error, time_elapsed):
         # proportional
         pid = self._kp*error
         
         # integral
-        self._integrator += error
+        self._integrator += error*time_elapsed
         pid += self._ki*self._integrator
         
         # differential
-        pid += self._kd*(error - self._last_error)
+        pid += self._kd*(error - self._last_error)/time_elapsed
         self._last_error = error
         
         if abs(error) < self._dead_band:

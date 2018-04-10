@@ -23,7 +23,6 @@ class NavSystem:
         self.paused = False
         self.forward_velocity = 0.0
         self.angular_velocity = 0.0
-        self._last_time = 0.0
     
     def steer_towards(self, rel_pos_from_ball_pov, ball_speed, ball_move_angle):
         pass
@@ -54,14 +53,13 @@ class NavSystem:
             self.forward_velocity = self._forward_pid.calc(self.dist_to_ball - target_ball_dist)
             self.angular_velocity = self._turn_pid.calc(self.angle_to_ball*0.5)
     
-    def _timer_callback(self):
-        self._drive_controller.check_current()
+    def _timer_callback(self, time_elapsed):
+        # self._drive_controller.check_current()
         
         # calculate time since encoders were last read
-        interval = time() - self._last_time
-        self._last_time += interval
-        dist, angle = self._drive_controller.read_encoders(interval)
-        self.dead_reckon_angle(angle)
+        dist, angle = self._drive_controller.read_encoders(time_elapsed)
+        
+        # self.dead_reckon_angle(angle)
         # if lost ball slow to a stop
         if self.paused:
             self._drive_controller.update_motors(0.0, 0.0)

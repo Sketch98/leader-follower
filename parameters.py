@@ -12,24 +12,24 @@ min_obj_radius = 3
 
 # ----- pids -----
 servo_pid_constants = {
-    'kp': 0.3,
+    'kp': 0.1,
     'ki': 0,
     'kd': 0
 }
 left_motor_pid_constants = {
     'kp': 0.00110,
-    'ki': 0.0178333,
+    'ki': 1.78333,
     'kd': 0
 }
 right_motor_pid_constants = {
     'kp': 0.00102,
-    'ki': 0.0178333,
+    'ki': 1.78333,
     'kd': 0
 }
 forward_pid_constants = {
     'kp': 0.2,
-    'ki': 0.05,
-    'kd': 1
+    'ki': 2.5,
+    'kd': 0.02
 }
 angle_pid_constants = {
     'kp': 0.5,
