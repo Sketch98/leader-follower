@@ -1,21 +1,17 @@
 from time import time
 
-from log_decorator import LogDecorator
-
 
 class Timer:
-    def __init__(self):
+    def __init__(self, lower_limit=0.0):
         self.t = time()
+        self.lower_limit = lower_limit
     
     def start(self):
         self.t = time()
     
-    # @LogDecorator('b.csv')
-    def elapsed(self, update=True):
+    def elapsed(self):
         dif = time() - self.t
-        if update:
-            self.t += dif
+        if dif < self.lower_limit:
+            return None
+        self.t += dif
         return dif
-    
-    # def close(self):
-    #     self.elapsed.close()

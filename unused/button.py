@@ -33,7 +33,6 @@ class Button:
 if __name__ == '__main__':
     from time import sleep
     
-    
     raspi = pigpio.pi()
     btn = Button(12)
     while True:

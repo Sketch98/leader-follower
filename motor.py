@@ -16,12 +16,15 @@ class Motor:
         self._set_pwm(0)
     
     def _set_dir(self, direction):
-        assert direction in [0, 1], 'invalid direction = {} in _set_dir'.format(direction)
+        assert direction in [0, 1], 'invalid direction = {} in _set_dir'.format(
+            direction)
         raspi.write(self._dir_pin, direction)
     
     def _set_pwm(self, pwm):
         pwm = pwm
-        assert motor_pwm_range >= pwm >= 0, 'invalid pwm = {} in _set_pwm'.format(pwm)
+        assert motor_pwm_range >= pwm >= 0, 'invalid pwm = {} in ' \
+                                            '_set_pwm'.format(
+            pwm)
         raspi.set_PWM_dutycycle(self._pwm_pin, int(pwm))
     
     def stop(self):

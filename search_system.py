@@ -1,7 +1,10 @@
 from enum import Enum
 from math import pi
 
-from parameters import acceptable_angle_error, count_before_search, sweep_speed, spin_speed, sweeps_before_spin
+from parameters import acceptable_angle_error, count_before_search, \
+    spin_speed, \
+    sweep_speed, sweeps_before_spin
+
 
 class SearchMode(Enum):
     left = 'left'
@@ -29,14 +32,18 @@ class SearchSystem():
         self._num_sweeps = 0
     
     def in_search_mode_simple(self, ball_angle):
-        # ball_angle is None when the ball isn't on screen, so we need to search for it
+        # ball_angle is None when the ball isn't on screen, so we need to
+        # search for it
         if ball_angle is None:
-            # set direction to angle of last seen direction if we're entering search mode
-            # otherwise we don't want to modify direction because it needs to sweep back and forth
+            # set direction to angle of last seen direction if we're entering
+            #  search mode
+            # otherwise we don't want to modify direction because it needs to
+            #  sweep back and forth
             # which requires it to be modified elsewhere
             if not self._searching:
                 self._num_sweeps = 0
-                self._mode = SearchMode.left if self._last_seen_angle < 0 else SearchMode.right
+                self._mode = SearchMode.left if self._last_seen_angle < 0 \
+                    else SearchMode.right
                 self._searching = True
         else:
             self._last_seen_angle = ball_angle
@@ -44,7 +51,8 @@ class SearchSystem():
         return self._searching
     
     def in_search_mode(self, ball_angle):
-        # ball_angle is None when the ball isn't on screen, so we need to search for it
+        # ball_angle is None when the ball isn't on screen, so we need to
+        # search for it
         if ball_angle is None:
             if self._searching:
                 return True
@@ -56,7 +64,8 @@ class SearchSystem():
         
         # enter search mode if reached count_before_search
         if self._count == count_before_search:
-            self._mode = SearchMode.left if self._last_seen_angle < 0 else SearchMode.right
+            self._mode = SearchMode.left if self._last_seen_angle < 0 else \
+                SearchMode.right
             self._searching = True
         return self._searching
     

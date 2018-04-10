@@ -12,7 +12,8 @@ class PID:
         pid = self._kp*error
         
         # integral
-        self._integrator += error*time_elapsed
+        # use average of error and last error for trapezoid approximation
+        self._integrator += time_elapsed*(error + self._last_error)/2
         pid += self._ki*self._integrator
         
         # differential

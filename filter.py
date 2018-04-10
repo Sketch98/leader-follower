@@ -20,12 +20,15 @@ class Filter:
 
 class ExponentialFilter():
     def __init__(self, smoothing_factor):
-        assert 0 < smoothing_factor <= 1, 'smoothing factor must be in (0, 1]. it is {}'.format(smoothing_factor)
+        assert 0 < smoothing_factor <= 1, 'smoothing factor must be in (0, ' \
+                                          '1]. it is {}'.format(
+            smoothing_factor)
         self._smoothing_factor = smoothing_factor
         self._smoothed = 0
     
     def filter(self, val):
-        self._smoothed = self._smoothing_factor*val + (1 - self._smoothing_factor)*self._smoothed
+        self._smoothed = self._smoothing_factor*val + (
+                1 - self._smoothing_factor)*self._smoothed
         return self._smoothed
     
     def reset(self):
@@ -34,9 +37,12 @@ class ExponentialFilter():
 
 class DoubleExponentialFilter():
     def __init__(self, smoothing_factor, trend_smoothing_factor):
-        assert 0 < smoothing_factor <= 1, 'smoothing factor must be in (0, 1]. it is {}'.format(smoothing_factor)
+        assert 0 < smoothing_factor <= 1, 'smoothing factor must be in (0, ' \
+                                          '1]. it is {}'.format(
+            smoothing_factor)
         self._smoothing_factor = smoothing_factor
-        assert 0 < trend_smoothing_factor <= 1, 'trend smoothing factor must be in (0, 1]. it is {}'.format(
+        assert 0 < trend_smoothing_factor <= 1, 'trend smoothing factor must ' \
+                                                'be in (0, 1]. it is {}'.format(
             trend_smoothing_factor)
         self._trend_smoothing_factor = trend_smoothing_factor
         self._smoothed = 0
@@ -44,9 +50,13 @@ class DoubleExponentialFilter():
     
     def filter(self, val):
         last_value = self._trend
-        self._smoothed = self._smoothing_factor*val + (1 - self._smoothing_factor)*(self._smoothed + self._trend)
-        self._trend = self._trend_smoothing_factor*(self._smoothed - last_value) \
-                      + (1 - self._trend_smoothing_factor)*self._trend_smoothing_factor
+        self._smoothed = self._smoothing_factor*val + (
+                1 - self._smoothing_factor)*(self._smoothed + self._trend)
+        self._trend = self._trend_smoothing_factor*(self._smoothed -
+                                                    last_value) \
+                      + (
+                              1 -
+                              self._trend_smoothing_factor)*self._trend_smoothing_factor
         return self._smoothed
     
     def reset(self):

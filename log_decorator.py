@@ -1,5 +1,6 @@
 from functools import wraps
 
+
 class LogDecorator:
     def __init__(self, file_name):
         self.file = open(file_name)
@@ -10,6 +11,7 @@ class LogDecorator:
             ret = func(*args, **kwargs)
             self.file.write('{}\n'.format(ret))
             return ret
+        
         return decorated
     
     def close(self):

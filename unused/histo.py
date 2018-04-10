@@ -1,9 +1,9 @@
-from numpy import loadtxt, ravel
 from matplotlib import pyplot
+from numpy import loadtxt, ravel
 
-
-v = loadtxt('b.csv', delimiter=",", dtype='float', comments="#", skiprows=0, usecols=None)
-v_hist = ravel(v)   # 'flatten' v
+v = loadtxt('b.csv', delimiter=",", dtype='float', comments="#", skiprows=0,
+            usecols=None)
+v_hist = ravel(v)  # 'flatten' v
 fig = pyplot.figure()
 ax1 = fig.add_subplot(111)
 

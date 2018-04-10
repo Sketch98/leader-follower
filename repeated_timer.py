@@ -1,5 +1,5 @@
-from time import time
 from threading import Event, Thread
+from time import time
 
 
 class RepeatedTimer:

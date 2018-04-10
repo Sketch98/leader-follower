@@ -1,4 +1,4 @@
-from math import sqrt, atan2, sin, cos
+from math import atan2, cos, sin, sqrt
 
 
 class Position():

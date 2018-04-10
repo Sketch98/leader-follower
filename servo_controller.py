@@ -1,50 +1,51 @@
 from math import pi
 
-from parameters import max_move, servo_dead_band
+from globals import limit, symmetric_limit
+from parameters import max_servo_move, servo_dead_band
 from pid import PID
 from servo import Servo
-
-
-def limit(val, lower_limit, upper_limit):
-    # stops val from exceeding set limits
-    return min(max(val, lower_limit), upper_limit)
+from timer import Timer
 
 
 class ServoController:
-    def __init__(self, pin, pid_constants, left_limit=-pi/2, right_limit=pi/2):
+    def __init__(self, pin, pid_constants, left_limit=-pi*2/3, right_limit=pi/2):
         self._servo = Servo(pin)
         self._pid = PID(pid_constants, servo_dead_band)
         if left_limit >= right_limit:
             raise Exception('left_limit >= right_limit')
         self._left_limit = left_limit
         self._right_limit = right_limit
-        self.angle = (self._left_limit + self._right_limit)/2
-        self._target = self.angle
+        self.angle = 0.0
+        
+        # servo cannot be set faster than 50Hz, so 20ms lower_limit
+        self.timer = Timer(0.02)
     
-    def track(self):
-        self.move_by(self._target - self.angle)
-    
-    def move_by(self, offset, time_elapsed):
-        # set target in case ball goes missing
-        self._target = self.angle + offset
+    def move_by(self, offset):
+        time_elapsed = self.timer.elapsed()
+        if time_elapsed is None:
+            return
         
         offset = self._pid.calc(offset, time_elapsed)
         
         # ensure that servo moves at most by max_move
-        offset = limit(offset, -max_move, max_move)
+        offset = symmetric_limit(offset, max_servo_move)
         self._move_to(self.angle + offset)
     
     def _move_to(self, angle):
         # ensure servo doesn't move beyond limits
         angle = limit(angle, self._left_limit, self._right_limit)
         self.angle = angle
-        self._servo.move_to((angle - self._left_limit)/(self._right_limit - self._left_limit))
+        self._servo.move_to(self.angle_ratio(angle))
+    
+    def angle_ratio(self, angle):
+        return (angle - self._left_limit)/(self._right_limit - self._left_limit)
+    
+    def start(self):
+        self.timer.start()
     
     def stop(self):
-        self._move_to((self._left_limit + self._right_limit)/2)
-        self._target = (self._left_limit + self._right_limit)/2
+        self._move_to(0)
         self._pid.reset()
-        self._servo.stop()
 
 
 if __name__ == "__main__":
@@ -56,14 +57,14 @@ if __name__ == "__main__":
     sleep(1)
     servo_controller.move_by(-pi/2)
     sleep(0.1)
-    for _ in range(10):
-        servo_controller.track()
-        sleep(0.1)
-    servo_controller.move_by(pi)
-    sleep(0.1)
-    for _ in range(20):
-        servo_controller.track()
-        sleep(0.1)
+    for _ in range(100):
+        servo_controller.move_by(-pi/2 - servo_controller.angle)
+        sleep(0.01)
+    servo_controller.move_by(pi/2 - servo_controller.angle)
+    sleep(0.5)
+    for _ in range(200):
+        servo_controller.move_by(pi/2 - servo_controller.angle)
+        sleep(0.01)
     
     servo_controller.stop()
     raspi.stop()

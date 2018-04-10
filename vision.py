@@ -4,7 +4,7 @@ from time import sleep
 import cv2
 from imutils.video import VideoStream
 
-from parameters import min_obj_radius, pink, resolution, camera_dist_offset
+from parameters import camera_dist_offset, min_obj_radius, pink, resolution
 
 
 def angle_to_pixel(x_pix):
@@ -31,7 +31,9 @@ class Vision:
         # mask = cv2.dilate(mask, None, iterations=1)
         
         # find contours in the mask
-        contours = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
+        contours = \
+            cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[
+                -2]
         
         x = -1
         y = -1
