@@ -5,6 +5,7 @@ from search_system import SearchSystem
 from timer import Timer
 from vision import Vision
 
+
 position_system = PositionSystem()
 search_system = SearchSystem()
 timer = Timer()
@@ -25,7 +26,11 @@ try:
         #     continue
         
         # if ball is seen move the servo to it and steer towards it
-        if dist is not None:
+        if dist is None:
+            print('no')
+            nav_system.slow_forward()
+        else:
+            print('yes')
             nav_system.update_ball_pos(dist, camera_to_ball_angle)
 
 except KeyboardInterrupt:

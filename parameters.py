@@ -12,9 +12,9 @@ min_obj_radius = 3
 
 # ----- pids -----
 servo_pid_constants = {
-    'kp': 0.1,
+    'kp': 0.15,
     'ki': 0,
-    'kd': 0
+    'kd': 0.005
 }
 left_motor_pid_constants = {
     'kp': 0.00110,
@@ -27,31 +27,31 @@ right_motor_pid_constants = {
     'kd': 0
 }
 forward_pid_constants = {
-    'kp': 0.2,
-    'ki': 2.5,
-    'kd': 0.02
+    'kp': 2,
+    'ki': 1,
+    'kd': 0.2
 }
 angle_pid_constants = {
     'kp': 1,
     'ki': 0,
     'kd': 0.01
 }
-
+servo_dead_band = 0.05
 # ----- navigation -----
+# maximum forward speed
+max_forward_speed = 2500
+# maximum angular speed
+max_angular_speed = 2.5
 # the distance the vehicle will aim to stay from the ball
-target_ball_dist = 600
+target_ball_dist = 370
+# the period the navigation system is run at
+nav_timer_interval = 0.01
 # when estimating the vehicles movements we use a point and shoot method
 # which estimates a turn as a zero-radius turn
 # and forward movement. this only works if the turns are kept small so we
 # recursively split up large turns into many
 # small turns with angles less than the parameter 'small_angle'
 small_angle = pi/36
-# the period the navigation system is run at
-nav_timer_interval = 0.01
-# maximum forward speed
-max_forward_speed = 500
-# maximum angular speed
-max_angular_speed = 2
 
 # ----- search system -----
 # number of frames with the ball missing before searching starts
@@ -72,9 +72,6 @@ sweeps_before_spin = 4
 # ----- miscellaneous -----
 # minimum time in between presses of a button
 button_debounce_delay = 0.3
-# movements smaller than the dead zone will be treated as 0 to stop shaking
-# back and forth
-servo_dead_band = 0.07
 # factors for smoothing encoder input
 smoothing_factor = 1.0
 trend_smoothing_factor = 1.0

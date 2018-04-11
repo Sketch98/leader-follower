@@ -52,6 +52,8 @@ class NavSystem:
         elif abs(angle_error) > pi/12:
             dist_error *= 0.9
         
+        print(dist_error)
+        
         forward_vel = self._forward_pid.calc(dist_error, time_elapsed)
         angular_vel = self._turn_pid.calc(angle_error, time_elapsed)
         forward_vel = symmetric_limit(forward_vel, max_forward_speed)
@@ -64,6 +66,7 @@ class NavSystem:
     
     def slow_forward(self):
         self._dist_to_ball = target_ball_dist
+        self._forward_pid.reset()
     
     def update_ball_pos(self, dist, angle):
         self._dist_to_ball = dist
