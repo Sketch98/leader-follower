@@ -1,5 +1,6 @@
 from math import pi
 
+from globals import correct_angle
 from motor_controller import MotorController
 from parameters import distance_between_wheels, left_motor_pid_constants, \
     left_pins, right_motor_pid_constants, right_pins, small_angle
@@ -47,15 +48,15 @@ class DriveController:
         dist, angle = forward_kin(left_dist_traveled, right_dist_traveled)
         
         # dead reckon pos and angle
-        self.robot_angle += angle
+        self.robot_angle = correct_angle(self.robot_angle + angle)
         # self.dead_reckon(dist, angle)
         
-        return dist, angle
+        return dist
     
     def dead_reckon(self, dist, angle):
         if abs(angle) <= small_angle:
             pos = self.pos_heading[0].pos_from_dist_angle(dist, angle)
-            theta = self.pos_heading[1] + angle%(2*pi)
+            theta = correct_angle(self.pos_heading[1] + angle)
             self.pos_heading = (pos, theta)
             return
         self.dead_reckon(dist/2, angle/2)

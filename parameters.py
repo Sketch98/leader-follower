@@ -32,9 +32,9 @@ forward_pid_constants = {
     'kd': 0.02
 }
 angle_pid_constants = {
-    'kp': 0.5,
+    'kp': 1,
     'ki': 0,
-    'kd': 0
+    'kd': 0.01
 }
 
 # ----- navigation -----
@@ -51,7 +51,7 @@ nav_timer_interval = 0.01
 # maximum forward speed
 max_forward_speed = 500
 # maximum angular speed
-max_angular_speed = 3
+max_angular_speed = 2
 
 # ----- search system -----
 # number of frames with the ball missing before searching starts

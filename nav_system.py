@@ -1,7 +1,7 @@
 from math import pi
 
 from drive_controller import DriveController
-from globals import symmetric_limit
+from globals import symmetric_limit, correct_angle
 from parameters import angle_pid_constants, forward_pid_constants, \
     max_angular_speed, max_forward_speed, nav_timer_interval, servo_pid_constants, \
     servo_pin, target_ball_dist
@@ -25,11 +25,12 @@ class NavSystem:
     
     def _timer_callback(self, time_elapsed):
         # get dist and angle since last callback
-        dist, angle = self._drive_controller.read_encoders(time_elapsed)
+        dist = self._drive_controller.read_encoders(time_elapsed)
         
         # adjust servo to account for robot's spin
-        self.servo_controller.move_by(
-            self._abs_ball_angle - self.abs_servo_angle())
+        angle_error = self._abs_ball_angle - self.abs_servo_angle()
+        angle_error = correct_angle(angle_error)
+        self.servo_controller.move_by(angle_error)
         
         # calculate wanted forward and angular speed
         forward_vel, angular_vel = self.calc_velocities(time_elapsed)
@@ -37,28 +38,36 @@ class NavSystem:
                                              time_elapsed)
     
     def calc_velocities(self, time_elapsed):
+        dist_error = self._dist_to_ball - target_ball_dist
         angle_error = self._abs_ball_angle - self._drive_controller.robot_angle
-        if abs(angle_error) > pi/4:
-            forward_vel = self._forward_pid.calc((self._dist_to_ball - target_ball_dist)*0.1,
-                                                 time_elapsed)
-        else:
-            forward_vel = self._forward_pid.calc((self._dist_to_ball - target_ball_dist),
-                                                 time_elapsed)
+        angle_error = correct_angle(angle_error)
+        if abs(angle_error) > pi*5/12:
+            dist_error *= 0
+        elif abs(angle_error) > pi/3:
+            dist_error *= 0.15
+        elif abs(angle_error) > pi/4:
+            dist_error *= 0.3
+        elif abs(angle_error) > pi/6:
+            dist_error *= 0.5
+        elif abs(angle_error) > pi/12:
+            dist_error *= 0.9
+        
+        forward_vel = self._forward_pid.calc(dist_error, time_elapsed)
         angular_vel = self._turn_pid.calc(angle_error, time_elapsed)
         forward_vel = symmetric_limit(forward_vel, max_forward_speed)
         angular_vel = symmetric_limit(angular_vel, max_angular_speed)
         return forward_vel, angular_vel
     
     def abs_servo_angle(self):
-        return self.servo_controller.angle + self._drive_controller.robot_angle
+        a = self.servo_controller.angle + self._drive_controller.robot_angle
+        return correct_angle(a)
     
     def slow_forward(self):
         self._dist_to_ball = target_ball_dist
     
     def update_ball_pos(self, dist, angle):
-        print(angle*180/pi)
         self._dist_to_ball = dist
-        self._abs_ball_angle = self.abs_servo_angle() + angle
+        self._abs_ball_angle = correct_angle(self.abs_servo_angle() + angle)
     
     def start(self):
         self._repeated_timer.start()
