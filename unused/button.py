@@ -12,17 +12,10 @@ class Button:
     Waits for a button to be pressed
     """
     
-    def __init__(self, in_pin, out_pin):
+    def __init__(self, pin):
         global raspi
-        raspi.set_mode(in_pin, pigpio.INPUT)
-        raspi.set_mode(out_pin, pigpio.OUTPUT)
-        
-        raspi.set_pull_up_down(in_pin, pigpio.PUD_DOWN)
-        raspi.set_pull_up_down(out_pin, pigpio.PUD_UP)
-        
-        raspi.write(out_pin, 1)
-        
-        self._cb = raspi.callback(in_pin, pigpio.RISING_EDGE, self._press)
+        raspi.set_mode(pin, pigpio.INPUT)
+        self._cb = raspi.callback(pin, pigpio.RISING_EDGE, self._press)
         
         self._last_time = 0.0
     

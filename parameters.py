@@ -12,9 +12,9 @@ min_obj_radius = 3
 
 # ----- pids -----
 servo_pid_constants = {
-    'kp': 0.15,
+    'kp': 0.1,
     'ki': 0,
-    'kd': 0.005
+    'kd': 0
 }
 left_motor_pid_constants = {
     'kp': 0.00110,
@@ -27,9 +27,9 @@ right_motor_pid_constants = {
     'kd': 0
 }
 forward_pid_constants = {
-    'kp': 2,
-    'ki': 1,
-    'kd': 0.2
+    'kp': 0.2,
+    'ki': 2.5,
+    'kd': 0.02
 }
 angle_pid_constants = {
     'kp': 1,
@@ -38,20 +38,20 @@ angle_pid_constants = {
 }
 servo_dead_band = 0.05
 # ----- navigation -----
-# maximum forward speed
-max_forward_speed = 2500
-# maximum angular speed
-max_angular_speed = 2.5
 # the distance the vehicle will aim to stay from the ball
-target_ball_dist = 370
-# the period the navigation system is run at
-nav_timer_interval = 0.01
+target_ball_dist = 600
 # when estimating the vehicles movements we use a point and shoot method
 # which estimates a turn as a zero-radius turn
 # and forward movement. this only works if the turns are kept small so we
 # recursively split up large turns into many
 # small turns with angles less than the parameter 'small_angle'
 small_angle = pi/36
+# the period the navigation system is run at
+nav_timer_interval = 0.01
+# maximum forward speed
+max_forward_speed = 500
+# maximum angular speed
+max_angular_speed = 2
 
 # ----- search system -----
 # number of frames with the ball missing before searching starts
