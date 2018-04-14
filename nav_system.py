@@ -8,12 +8,14 @@ from parameters import angle_pid_constants, forward_pid_constants, \
 from pid import PID
 from repeated_timer import RepeatedTimer
 from servo_controller import ServoController
+from search_system import SearchSystem
 
 
 class NavSystem:
     # TODO: implement updating distance and pos with dead reckoning
     def __init__(self):
         self._drive_controller = DriveController()
+        self._search_system = SearchSystem()
         self.servo_controller = ServoController(servo_pin, servo_pid_constants)
         self._repeated_timer = RepeatedTimer(nav_timer_interval,
                                              self._timer_callback)
@@ -25,7 +27,7 @@ class NavSystem:
     
     def _timer_callback(self, time_elapsed):
         # get dist and angle since last callback
-        dist = self._drive_controller.read_encoders(time_elapsed)
+        self._drive_controller.read_encoders(time_elapsed)
         
         # adjust servo to account for robot's spin
         angle_error = self._abs_ball_angle - self.abs_servo_angle()

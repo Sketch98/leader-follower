@@ -1,11 +1,13 @@
 class PID:
-    def __init__(self, pid_constants, dead_band=0):
+    def __init__(self, pid_constants):
         self._kp = pid_constants['kp']
         self._ki = pid_constants['ki']
         self._kd = pid_constants['kd']
         self._integrator = 0
         self._last_error = 0
-        self._dead_band = dead_band
+        self._dead_band = 0
+        if 'dead_band' in pid_constants:
+            self._dead_band = pid_constants['dead_band']
     
     def calc(self, error, time_elapsed):
         # proportional

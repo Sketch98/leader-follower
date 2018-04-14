@@ -1,7 +1,7 @@
 from math import pi
 
 from globals import limit, symmetric_limit
-from parameters import max_servo_move, servo_dead_band
+from parameters import max_servo_move
 from pid import PID
 from servo import Servo
 from timer import Timer
@@ -10,7 +10,7 @@ from timer import Timer
 class ServoController:
     def __init__(self, pin, pid_constants, left_limit=-pi*2/3, right_limit=pi/2):
         self._servo = Servo(pin)
-        self._pid = PID(pid_constants, servo_dead_band)
+        self._pid = PID(pid_constants)
         if left_limit >= right_limit:
             raise Exception('left_limit >= right_limit')
         self._left_limit = left_limit

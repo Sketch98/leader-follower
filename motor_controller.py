@@ -1,8 +1,7 @@
 from current_sensor import CurrentSensor
 from filter import DoubleExponentialFilter
 from motor import Motor
-from parameters import distance_ratio, max_wheel_vel, smoothing_factor, \
-    trend_smoothing_factor
+from parameters import distance_ratio, max_wheel_vel, motor_vel_smoothing_factors
 from pid import PID
 from rotary_encoder import RotaryEncoder
 
@@ -13,8 +12,7 @@ class MotorController:
         self._motor = Motor(pins['pwm'], pins['dir'], forward)
         self._encoder = RotaryEncoder(pins['a'], pins['b'])
         self._pid = PID(pid_constants)
-        self._vel_filter = DoubleExponentialFilter(smoothing_factor,
-                                                   trend_smoothing_factor)
+        self._vel_filter = DoubleExponentialFilter(*motor_vel_smoothing_factors)
         self._vel = 0
     
     def adjust_motor_speed(self, target_vel, time_elapsed):

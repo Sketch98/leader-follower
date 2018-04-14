@@ -5,6 +5,10 @@ from math import pi
 # --------------------- parameters -----------------------------
 # --------------------------------------------------------------
 
+motor_vel_smoothing_factors = (1.0, 1.0)
+move_dist_smoothing_factors = (1.0, 1.0)
+heading_smoothing_factors = (1.0, 1.0)
+
 # ----- camera stuff -----
 pink = ((140, 100, 100), (240, 255, 255))
 resolution = (640, 480)
@@ -14,29 +18,33 @@ min_obj_radius = 3
 servo_pid_constants = {
     'kp': 0.1,
     'ki': 0,
-    'kd': 0
+    'kd': 0,
+    'dead_band': 0.05
 }
 left_motor_pid_constants = {
     'kp': 0.00110,
     'ki': 1.78333,
-    'kd': 0
+    'kd': 0,
+    'dead_band': 5
 }
 right_motor_pid_constants = {
     'kp': 0.00102,
     'ki': 1.78333,
-    'kd': 0
+    'kd': 0,
+    'dead_band': 5
 }
 forward_pid_constants = {
     'kp': 0.2,
     'ki': 2.5,
-    'kd': 0.02
+    'kd': 0.02,
+    'dead_band': 25
 }
 angle_pid_constants = {
-    'kp': 1,
+    'kp': 0.5,
     'ki': 0,
-    'kd': 0.01
+    'kd': 0.01,
+    'dead_band': pi/36
 }
-servo_dead_band = 0.05
 # ----- navigation -----
 # the distance the vehicle will aim to stay from the ball
 target_ball_dist = 600
@@ -72,9 +80,6 @@ sweeps_before_spin = 4
 # ----- miscellaneous -----
 # minimum time in between presses of a button
 button_debounce_delay = 0.3
-# factors for smoothing encoder input
-smoothing_factor = 1.0
-trend_smoothing_factor = 1.0
 
 # --------------------------------------------------------------
 # ----------------------- constants ----------------------------
