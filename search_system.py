@@ -78,7 +78,6 @@ class SearchSystem():
         return False
     
     def search_servo(self, servo_angle):
-        # TODO: need way to change from left right sweep to center then spin
         if self._mode == SearchMode.left:
             # check if reached destination
             if self.reached_target_angle(servo_angle):

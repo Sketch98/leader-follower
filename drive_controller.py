@@ -8,9 +8,9 @@ from position import ZERO_POS
 
 
 def forward_kin(left, right):
-    dist = (left + right)/2
+    forward = (left + right)/2
     angle = (left - right)/distance_between_wheels
-    return dist, angle
+    return forward, angle
 
 
 def reverse_kin(forward, angle):

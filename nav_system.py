@@ -13,6 +13,7 @@ from search_system import SearchSystem
 
 class NavSystem:
     # TODO: implement updating distance and pos with dead reckoning
+    # TODO: add searching when ball not seen
     def __init__(self):
         self._drive_controller = DriveController()
         self._search_system = SearchSystem()

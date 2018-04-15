@@ -1,4 +1,4 @@
-from filter import DoubleExponentialFilter
+from filter import IrregularDoubleExponentialFilter
 from parameters import camera_y_offset, move_dist_smoothing_factors, heading_smoothing_factors
 from position import Position, ZERO_POS
 
@@ -6,8 +6,8 @@ from position import Position, ZERO_POS
 class PositionSystem:
     
     def __init__(self):
-        self._move_dist_filter = DoubleExponentialFilter(move_dist_smoothing_factors)
-        self._heading_filter = DoubleExponentialFilter(heading_smoothing_factors)
+        self._move_dist_filter = IrregularDoubleExponentialFilter(*move_dist_smoothing_factors)
+        self._heading_filter = IrregularDoubleExponentialFilter(*heading_smoothing_factors)
         self.last_ball_loc = ZERO_POS
     
     def calc_ball_movement(self, dist_to_ball, angle_to_ball, vehicle_xy_theta,

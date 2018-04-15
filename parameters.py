@@ -5,9 +5,9 @@ from math import pi
 # --------------------- parameters -----------------------------
 # --------------------------------------------------------------
 
-motor_vel_smoothing_factors = (1.0, 1.0)
-move_dist_smoothing_factors = (1.0, 1.0)
-heading_smoothing_factors = (1.0, 1.0)
+motor_vel_smoothing_factors = (0.01, 0.9, 0.9)
+move_dist_smoothing_factors = (20.0, 0.9, 0.9)
+heading_smoothing_factors = (20.0, 0.9, 0.9)
 
 # ----- camera stuff -----
 pink = ((140, 100, 100), (240, 255, 255))
@@ -67,7 +67,7 @@ count_before_search = 30
 # the amount that the servo can be off from the target angle when sweeping
 # and still be recognized as reaching the
 # target
-acceptable_angle_error = 0.15
+acceptable_angle_error = 0.08
 # speed that the servo sweeps at when searching
 # the value does not correspond to any physical speed. its just a scalar
 sweep_speed = 0.2
@@ -75,7 +75,7 @@ sweep_speed = 0.2
 spin_speed = 1.0
 # number of times the servo will sweep from one side to another before it
 # switches to the robot spinning
-sweeps_before_spin = 4
+sweeps_before_spin = 2
 
 # ----- miscellaneous -----
 # minimum time in between presses of a button
