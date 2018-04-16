@@ -1,5 +1,5 @@
 from mcp3008 import read_channel
-from parameters import current_coefficient, current_time_limit
+from parameters import current_time_limit
 
 
 class CurrentException(Exception):
@@ -13,10 +13,13 @@ class CurrentSensor:
     
     def check_current(self):
         # convert adc reading to amps
-        current = read_channel(self._mcp_channel)*current_coefficient
+        current = read_channel(self._mcp_channel)
+        current = (current - 510)*3.3/1024/0.04 - 0.04
         if current >= 30:
             self._counter += 1
             if self._counter >= current_time_limit:
-                raise CurrentException
+                pass
+                # raise CurrentException
         else:
             self._counter -= 1
+        return current

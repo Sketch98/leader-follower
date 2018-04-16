@@ -64,8 +64,7 @@ max_angular_speed = 2
 # number of frames with the ball missing before searching starts
 count_before_search = 30
 # the amount that the servo can be off from the target angle when sweeping
-# and still be recognized as reaching the
-# target
+# and still be recognized as reaching the target
 acceptable_angle_error = 0.08
 # speed that the servo sweeps at when searching
 # the value does not correspond to any physical speed. its just a scalar
@@ -98,8 +97,6 @@ servo_speed = 8.727
 max_servo_move = servo_speed/50
 
 # ----- current sensor -----
-# converts 10 bit adc to current in amps
-current_coefficient = 0.0488
 current_time_limit = 500
 
 # also equal to the pos_dif per rev
