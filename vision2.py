@@ -15,12 +15,12 @@ def angle_to_pixel(x_pix):
 class Vision:
     def __init__(self):
         # initialize the video stream and allow the camera sensor to warm up
-        self._pvs = PiVideoStream(awb_gains, resolution).start()
-        sleep(2)
+        self._pvs = PiVideoStream(awb_gains, resolution)
     
     def _analyze_frame(self):
         # grab the current frame and convert it to the HSV color space
-        hsv = cv2.cvtColor(self._pvs.frame, cv2.COLOR_BGR2HSV)
+        frame = self._pvs.frame
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         
         # construct a mask for the color pink
         mask = cv2.inRange(hsv, pink[0], pink[1])
@@ -29,10 +29,8 @@ class Vision:
         contours = \
             cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[
                 -2]
-        
-        x = -1
-        y = -1
-        diameter = -1
+
+        x, y, diameter = None, None, None
         # only proceed if at least one contour was found
         if len(contours) > 0:
             # find the largest contour in the mask, then use it to compute
@@ -46,8 +44,9 @@ class Vision:
                 y = y_pix
                 diameter = radius*2
         
-        cv2.imshow('mask', mask)
-        cv2.waitKey(1) & 0xFF
+        # cv2.imshow('frame', frame)
+        # cv2.imshow('mask', mask)
+        # cv2.waitKey(1) & 0xFF
         
         return x, y, diameter
     
@@ -59,10 +58,8 @@ class Vision:
         # not using the y position of the ball in frame currently
         x_pix, _, diameter = self._analyze_frame()
         print(diameter)
-        """
-        return None if ball not in frame
-        """
-        if x_pix < 0:
+        # return None if ball not in frame
+        if x_pix is None:
             return None, None
         
         left_angle = angle_to_pixel(x_pix - diameter/2.0)
@@ -70,6 +67,10 @@ class Vision:
         ball_angle = (right_angle + left_angle)/2
         dist = abs(33.1/tan(right_angle - left_angle)) + camera_dist_offset
         return dist, ball_angle
+    
+    def start(self):
+        self._pvs.start()
+        sleep(2)
     
     def stop(self):
         self._pvs.stop()

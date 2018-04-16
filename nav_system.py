@@ -72,6 +72,7 @@ class NavSystem:
         if dist is None:
             self.slow_forward()
             return
+        print(dist)
         self._dist_to_ball = dist
         self._abs_ball_angle = correct_angle(self.abs_servo_angle() + angle)
     

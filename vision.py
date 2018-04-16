@@ -16,8 +16,7 @@ def angle_to_pixel(x_pix):
 class Vision:
     def __init__(self):
         # initialize the video stream and allow the camera sensor to warm up
-        self._vs = VideoStream(usePiCamera=True, resolution=resolution).start()
-        sleep(2)
+        self._vs = VideoStream(usePiCamera=True, resolution=resolution)
     
     def _analyze_frame(self):
         # grab the current frame and convert it to the HSV color space
@@ -35,9 +34,7 @@ class Vision:
             cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[
                 -2]
         
-        x = -1
-        y = -1
-        diameter = -1
+        x, y, diameter = None, None, None
         # only proceed if at least one contour was found
         if len(contours) > 0:
             # find the largest contour in the mask, then use it to compute
@@ -64,11 +61,8 @@ class Vision:
         """
         # not using the y position of the ball in frame currently
         x_pix, _, diameter = self._analyze_frame()
-        print(diameter)
-        """
-        return None if ball not in frame
-        """
-        if x_pix < 0:
+        # return None if ball not in frame
+        if x_pix is None:
             return None, None
         
         left_angle = angle_to_pixel(x_pix - diameter/2.0)
@@ -76,6 +70,10 @@ class Vision:
         ball_angle = (right_angle + left_angle)/2
         dist = abs(33.1/tan(right_angle - left_angle)) + camera_dist_offset
         return dist, ball_angle
+    
+    def start(self):
+        self._vs.start()
+        sleep(2)
     
     def stop(self):
         self._vs.stop()

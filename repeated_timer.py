@@ -11,20 +11,19 @@ class RepeatedTimer:
         self._last_time = 0
         self._event = Event()
         self._thread = Thread(target=self._target)
-        self._thread.daemon = True
-        self._stopped = False
     
     def _target(self):
         while not self._event.wait(self._time()):
-            if self._stopped:
-                return
             time_elapsed = time() - self._last_time
             self._last_time += time_elapsed
             self._func(time_elapsed)
     
     def _time(self):
         time_elapsed = time() - self._last_time
-        return max(0, self._interval - time_elapsed)
+        if self._interval < time_elapsed:
+            print('repeated_timer took {}, which is longer than interval {}'.format(time_elapsed, self._interval))
+            return 0
+        return self._interval - time_elapsed
     
     def start(self):
         self._last_time = time()
@@ -53,4 +52,3 @@ if __name__ == '__main__':
     finally:
         repeated_timer.stop()
         print('OH NOOOO, IM MELTING')
-        sleep(1)

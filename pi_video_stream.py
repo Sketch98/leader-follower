@@ -4,7 +4,7 @@ from picamera.array import PiRGBArray
 
 
 class PiVideoStream:
-    def __init__(self, awb_gains, resolution, frame_rate=32):
+    def __init__(self, awb_gains, resolution=(640, 480), frame_rate=42.1):
         # initialize the camera and stream
         self._camera = PiCamera()
         self._camera.resolution = resolution

@@ -1,6 +1,6 @@
 from globals import raspi
 from nav_system import NavSystem
-from vision import Vision
+from vision2 import Vision
 # from position_system import PositionSystem
 # from timer import Timer
 
@@ -11,6 +11,7 @@ vision = Vision()
 nav_system = NavSystem()
 try:
     nav_system.start()
+    vision.start()
     # timer.start()
     while True:
         dist, camera_to_ball_angle = vision.dist_angle_to_ball()
