@@ -11,7 +11,8 @@ heading_smoothing_factors = (20.0, 0.9, 0.9)
 
 # ----- camera stuff -----
 pink = ((140, 100, 100), (240, 255, 255))
-resolution = (1280, 720)
+awb_gains = (2.0, 2.0)
+resolution = (640, 320)
 min_obj_radius = 3
 
 # ----- pids -----
