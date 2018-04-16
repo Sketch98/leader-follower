@@ -11,7 +11,7 @@ heading_smoothing_factors = (20.0, 0.9, 0.9)
 
 # ----- camera stuff -----
 pink = ((140, 100, 100), (240, 255, 255))
-resolution = (640, 480)
+resolution = (1280, 720)
 min_obj_radius = 3
 
 # ----- pids -----
@@ -25,34 +25,33 @@ left_motor_pid_constants = {
     'kp': 0.00110,
     'ki': 1.78333,
     'kd': 0,
-    'dead_band': 5
+    # 'dead_band': 0.005
 }
 right_motor_pid_constants = {
     'kp': 0.00102,
     'ki': 1.78333,
     'kd': 0,
-    'dead_band': 5
+    # 'dead_band': 0.005
 }
 forward_pid_constants = {
     'kp': 0.2,
-    'ki': 2.5,
-    'kd': 0.02,
+    'ki': 1.5,
+    'kd': 0.04,
     'dead_band': 25
 }
 angle_pid_constants = {
     'kp': 0.5,
     'ki': 0,
-    'kd': 0.01,
+    'kd': 0.05,
     'dead_band': pi/36
 }
 # ----- navigation -----
 # the distance the vehicle will aim to stay from the ball
 target_ball_dist = 600
 # when estimating the vehicles movements we use a point and shoot method
-# which estimates a turn as a zero-radius turn
-# and forward movement. this only works if the turns are kept small so we
-# recursively split up large turns into many
-# small turns with angles less than the parameter 'small_angle'
+# which estimates a turn as a zero-radius turn and forward movement.
+# this only works if the turns are kept small so we recursively split up large
+# turns into many small turns with angles less than the parameter 'small_angle'
 small_angle = pi/36
 # the period the navigation system is run at
 nav_timer_interval = 0.01
@@ -89,18 +88,8 @@ button_debounce_delay = 0.3
 servo_pin = 25
 # pwm and dir for motor controller
 # a and b for rotary encoder quadrature input
-left_pins = {
-    'pwm': 6,
-    'dir': 5,
-    'a': 17,
-    'b': 27
-}
-right_pins = {
-    'pwm': 26,
-    'dir': 13,
-    'a': 23,
-    'b': 18
-}
+left_pins = {'pwm': 6, 'dir': 5, 'a': 17, 'b': 27}
+right_pins = {'pwm': 26, 'dir': 13, 'a': 23, 'b': 18}
 
 # ----- servo controller -----
 # speed of servo in radians per second

@@ -69,6 +69,9 @@ class NavSystem:
         self._dist_to_ball = target_ball_dist
     
     def update_ball_pos(self, dist, angle):
+        if dist is None:
+            self.slow_forward()
+            return
         self._dist_to_ball = dist
         self._abs_ball_angle = correct_angle(self.abs_servo_angle() + angle)
     

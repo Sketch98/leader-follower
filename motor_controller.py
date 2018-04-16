@@ -1,5 +1,5 @@
 from current_sensor import CurrentSensor
-from filter import DoubleExponentialFilter
+from filter import IrregularDoubleExponentialFilter
 from motor import Motor
 from parameters import distance_ratio, max_wheel_vel, motor_vel_smoothing_factors
 from pid import PID
@@ -12,7 +12,7 @@ class MotorController:
         self._motor = Motor(pins['pwm'], pins['dir'], forward)
         self._encoder = RotaryEncoder(pins['a'], pins['b'])
         self._pid = PID(pid_constants)
-        self._vel_filter = DoubleExponentialFilter(*motor_vel_smoothing_factors)
+        self._vel_filter = IrregularDoubleExponentialFilter(*motor_vel_smoothing_factors)
         self._vel = 0
     
     def adjust_motor_speed(self, target_vel, time_elapsed):
@@ -22,7 +22,7 @@ class MotorController:
     
     def read_encoder(self, time_elapsed):
         dist_traveled = self._encoder.get_pos_dif()*distance_ratio
-        self._vel = self._vel_filter.filter(dist_traveled/time_elapsed)
+        self._vel = self._vel_filter.filter(dist_traveled/time_elapsed, time_elapsed)
         return dist_traveled
     
     def brake(self):

@@ -49,7 +49,7 @@ class DriveController:
         
         # dead reckon pos and angle
         self.robot_angle = correct_angle(self.robot_angle + angle)
-        self.dead_reckon(dist, angle)
+        # self.dead_reckon(dist, angle)
     
     def dead_reckon(self, dist, angle):
         if abs(angle) <= small_angle:

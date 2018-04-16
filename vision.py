@@ -51,6 +51,10 @@ class Vision:
                 y = y_pix
                 diameter = radius*2
         
+        # cv2.imshow('frame', frame)
+        # cv2.imshow('mask', mask)
+        # cv2.waitKey(1) & 0xFF
+        
         return x, y, diameter
     
     def dist_angle_to_ball(self):
@@ -60,7 +64,7 @@ class Vision:
         """
         # not using the y position of the ball in frame currently
         x_pix, _, diameter = self._analyze_frame()
-        
+        print(diameter)
         """
         return None if ball not in frame
         """
