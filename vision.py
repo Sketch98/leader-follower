@@ -20,14 +20,10 @@ class Vision:
     
     def _analyze_frame(self):
         # grab the current frame and convert it to the HSV color space
-        frame = self._vs.read()
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        hsv = cv2.cvtColor(self._vs.read(), cv2.COLOR_BGR2HSV)
         
-        # construct a mask for the color pink, then perform a series of
-        # dilations and erosions to remove any small blobs left in the mask
+        # construct a mask for the color pink
         mask = cv2.inRange(hsv, pink[0], pink[1])
-        # mask = cv2.erode(mask, None, iterations=1)
-        # mask = cv2.dilate(mask, None, iterations=1)
         
         # find contours in the mask
         contours = \
@@ -47,10 +43,6 @@ class Vision:
                 x = x_pix
                 y = y_pix
                 diameter = radius*2
-        
-        # cv2.imshow('frame', frame)
-        # cv2.imshow('mask', mask)
-        # cv2.waitKey(1) & 0xFF
         
         return x, y, diameter
     

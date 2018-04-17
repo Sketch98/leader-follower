@@ -21,7 +21,7 @@ target_angle = {
 }
 
 
-class SearchSystem():
+class SearchSystem:
     
     def __init__(self):
         self._count = 0

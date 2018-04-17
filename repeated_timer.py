@@ -39,7 +39,7 @@ if __name__ == '__main__':
     
     
     def say_hello(interval):
-        print('hello at {}s'.format(interval))
+        print('hello, it has been {}s'.format(interval))
     
     
     repeated_timer = RepeatedTimer(0.1, say_hello)
@@ -48,7 +48,4 @@ if __name__ == '__main__':
         while True:
             sleep(10)
     except KeyboardInterrupt:
-        pass
-    finally:
         repeated_timer.stop()
-        print('OH NOOOO, IM MELTING')

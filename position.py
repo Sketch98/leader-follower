@@ -1,7 +1,7 @@
 from math import atan2, cos, sin, sqrt
 
 
-class Position():
+class Position:
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -9,7 +9,8 @@ class Position():
     def relative_xy_to(self, p):
         return Position(self.x - p.x, self.y - p.y)
     
-    def relative_dist_angle_to(self, dif):
+    def relative_dist_angle_to(self, p):
+        dif = self.relative_xy_to(p)
         dist = sqrt(dif.x*dif.x + dif.y*dif.y)
         angle = atan2(dif.y, dif.x)
         return dist, angle

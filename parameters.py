@@ -6,8 +6,8 @@ from math import pi
 # --------------------------------------------------------------
 
 motor_vel_smoothing_factors = (0.01, 0.9, 0.9)
-move_dist_smoothing_factors = (20.0, 0.9, 0.9)
-heading_smoothing_factors = (20.0, 0.9, 0.9)
+ball_speed_smoothing_factors = (20.0, 0.9, 0.9)
+ball_heading_smoothing_factors = (20.0, 0.9, 0.9)
 
 # ----- camera stuff -----
 pink = ((158, 114, 19), (170, 255, 236))
@@ -86,6 +86,7 @@ button_debounce_delay = 0.3
 
 # ----- pins ------
 servo_pin = 25
+button_pin = 22
 # pwm and dir for motor controller
 # a and b for rotary encoder quadrature input
 left_pins = {'pwm': 6, 'dir': 5, 'a': 17, 'b': 27}

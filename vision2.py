@@ -4,14 +4,7 @@ from time import sleep
 import cv2
 from pi_video_stream import PiVideoStream
 from parameters import camera_dist_offset, min_obj_radius, resolution, awb_gains
-
-
-pink = ((158, 114, 19), (170, 255, 236))
-
-
-def update_pink(p0, p1):
-    global pink
-    pink = (p0, p1)
+from parameters import pink
 
 
 def angle_to_pixel(x_pix):
@@ -23,11 +16,11 @@ def angle_to_pixel(x_pix):
 class Vision:
     def __init__(self):
         # initialize the video stream and allow the camera sensor to warm up
-        self._pvs = PiVideoStream(awb_gains, resolution)
+        self.pvs = PiVideoStream(self.do_shit)
     
     def _analyze_frame(self):
         # grab the current frame and convert it to the HSV color space
-        frame = self._pvs.frame
+        frame = self.pvs.frame
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         
         # construct a mask for the color pink
@@ -41,7 +34,7 @@ class Vision:
             cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[
                 -2]
 
-        x, y, diameter = None, None, None
+        x, diameter = None, None
         # only proceed if at least one contour was found
         if len(contours) > 0:
             # find the largest contour in the mask, then use it to compute
@@ -52,15 +45,14 @@ class Vision:
             # only proceed if the radius meets a minimum size
             if radius >= min_obj_radius:
                 x = x_pix
-                y = y_pix
                 diameter = radius*2
         
-        cv2.imshow('frame', frame)
-        cv2.imshow('hsv', hsv)
-        cv2.imshow('mask', mask)
-        cv2.waitKey(1) & 0xFF
+        # cv2.imshow('frame', frame)
+        # cv2.imshow('hsv', hsv)
+        # cv2.imshow('mask', mask)
+        # cv2.waitKey(1) & 0xFF
         
-        return x, y, diameter
+        return x, diameter
     
     def dist_angle_to_ball(self):
         """
@@ -68,7 +60,7 @@ class Vision:
         it uses that to estimate the distance and angle to the ball.
         """
         # not using the y position of the ball in frame currently
-        x_pix, _, diameter = self._analyze_frame()
+        x_pix, diameter = self._analyze_frame()
         print(diameter)
         # return None if ball not in frame
         if x_pix is None:
@@ -81,8 +73,8 @@ class Vision:
         return dist, ball_angle
     
     def start(self):
-        self._pvs.start()
+        self.pvs.start()
         sleep(2)
     
     def stop(self):
-        self._pvs.stop()
+        self.pvs.stop()
