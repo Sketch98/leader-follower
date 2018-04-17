@@ -21,7 +21,7 @@ class RepeatedTimer:
     def _time(self):
         time_elapsed = time() - self._last_time
         if self._interval < time_elapsed:
-            print('repeated_timer took {}, which is longer than interval {}'.format(time_elapsed, self._interval))
+            # print('repeated_timer took {}, which is longer than interval {}'.format(time_elapsed, self._interval))
             return 0
         return self._interval - time_elapsed
     

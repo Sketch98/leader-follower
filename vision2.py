@@ -3,7 +3,15 @@ from time import sleep
 
 import cv2
 from pi_video_stream import PiVideoStream
-from parameters import camera_dist_offset, min_obj_radius, pink, resolution, awb_gains
+from parameters import camera_dist_offset, min_obj_radius, resolution, awb_gains
+
+
+pink = ((158, 114, 19), (170, 255, 236))
+
+
+def update_pink(p0, p1):
+    global pink
+    pink = (p0, p1)
 
 
 def angle_to_pixel(x_pix):
@@ -23,7 +31,10 @@ class Vision:
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         
         # construct a mask for the color pink
+        print(pink)
         mask = cv2.inRange(hsv, pink[0], pink[1])
+        # mask = cv2.erode(mask, None, iterations=2)
+        # mask = cv2.dilate(mask, None, iterations=2)
         
         # find contours in the mask
         contours = \
@@ -44,9 +55,10 @@ class Vision:
                 y = y_pix
                 diameter = radius*2
         
-        # cv2.imshow('frame', frame)
-        # cv2.imshow('mask', mask)
-        # cv2.waitKey(1) & 0xFF
+        cv2.imshow('frame', frame)
+        cv2.imshow('hsv', hsv)
+        cv2.imshow('mask', mask)
+        cv2.waitKey(1) & 0xFF
         
         return x, y, diameter
     

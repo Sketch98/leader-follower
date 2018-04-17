@@ -10,10 +10,10 @@ move_dist_smoothing_factors = (20.0, 0.9, 0.9)
 heading_smoothing_factors = (20.0, 0.9, 0.9)
 
 # ----- camera stuff -----
-pink = ((140, 100, 100), (240, 255, 255))
-awb_gains = (1.165, 2.44)
-resolution = (640, 480)
-min_obj_radius = 3
+pink = ((158, 114, 19), (170, 255, 236))
+awb_gains = (1.0, 1.8)
+resolution = (320, 240)
+min_obj_radius = 8
 
 # ----- pids -----
 servo_pid_constants = {

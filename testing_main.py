@@ -1,8 +1,8 @@
 from globals import raspi
 from nav_system import NavSystem
-from vision import Vision
-import parameters
+from vision2 import Vision, update_pink
 from threading import Thread
+from parameters import pink as default_pink
 
 from matplotlib.widgets import Slider
 import matplotlib.pyplot as plt
@@ -18,50 +18,51 @@ slider_d = plt.axes([0.1, 0.35, 0.8, 0.05])
 slider_e = plt.axes([0.1, 0.45, 0.8, 0.05])
 slider_f = plt.axes([0.1, 0.55, 0.8, 0.05])
 
-a_slider = Slider(slider_a, 'a', a_min, a_max, valinit=a_init)
-b_slider = Slider(slider_b, 'b', a_min, a_max, valinit=a_init)
-c_slider = Slider(slider_c, 'c', a_min, a_max, valinit=a_init)
-d_slider = Slider(slider_d, 'd', a_min, a_max, valinit=a_init)
-e_slider = Slider(slider_e, 'e', a_min, a_max, valinit=a_init)
-f_slider = Slider(slider_f, 'f', a_min, a_max, valinit=a_init)
+a_slider = Slider(slider_a, 'a', a_min, a_max, valinit=default_pink[0][0])
+b_slider = Slider(slider_b, 'b', a_min, a_max, valinit=default_pink[1][0])
+c_slider = Slider(slider_c, 'c', a_min, a_max, valinit=default_pink[0][1])
+d_slider = Slider(slider_d, 'd', a_min, a_max, valinit=default_pink[1][1])
+e_slider = Slider(slider_e, 'e', a_min, a_max, valinit=default_pink[0][2])
+f_slider = Slider(slider_f, 'f', a_min, a_max, valinit=default_pink[1][2])
 
-a, b, c, d, e, f = 0, 0, 0, 0, 0, 0
+a, c, e = default_pink[0]
+b, d, f = default_pink[1]
 
 
 def update_ha(h):
     global a
     a = int(h)
-    parameters.pink = ((min(a, d), min(b, e), min(c, f)), (max(a, d), max(b, e), max(c, f)))
+    update_pink((min(a, b), min(c, d), min(e, f)), (max(a, b), max(c, d), max(e, f)))
 
 
 def update_hb(h):
     global b
     b = int(h)
-    parameters.pink = ((min(a, d), min(b, e), min(c, f)), (max(a, d), max(b, e), max(c, f)))
+    update_pink((min(a, b), min(c, d), min(e, f)), (max(a, b), max(c, d), max(e, f)))
 
 
 def update_sc(s):
     global c
     c = int(s)
-    parameters.pink = ((min(a, d), min(b, e), min(c, f)), (max(a, d), max(b, e), max(c, f)))
+    update_pink((min(a, b), min(c, d), min(e, f)), (max(a, b), max(c, d), max(e, f)))
 
 
 def update_sd(s):
     global d
     d = int(s)
-    parameters.pink = ((min(a, d), min(b, e), min(c, f)), (max(a, d), max(b, e), max(c, f)))
+    update_pink((min(a, b), min(c, d), min(e, f)), (max(a, b), max(c, d), max(e, f)))
 
 
 def update_ve(v):
     global e
     e = int(v)
-    parameters.pink = ((min(a, d), min(b, e), min(c, f)), (max(a, d), max(b, e), max(c, f)))
+    update_pink((min(a, b), min(c, d), min(e, f)), (max(a, b), max(c, d), max(e, f)))
 
 
 def update_vf(v):
     global f
     f = int(v)
-    parameters.pink = ((min(a, d), min(b, e), min(c, f)), (max(a, d), max(b, e), max(c, f)))
+    update_pink((min(a, b), min(c, d), min(e, f)), (max(a, b), max(c, d), max(e, f)))
 
 
 a_slider.on_changed(update_ha)
@@ -77,6 +78,7 @@ def target():
     nav_system = NavSystem()
     try:
         nav_system.start()
+        vision.start()
         while True:
             dist, camera_to_ball_angle = vision.dist_angle_to_ball()
             nav_system.update_ball_pos(dist, camera_to_ball_angle)

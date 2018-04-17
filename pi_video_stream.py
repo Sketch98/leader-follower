@@ -10,6 +10,7 @@ class PiVideoStream:
         self._camera.resolution = resolution
         self._camera.framerate = frame_rate
         self._camera.awb_mode = 'off'
+        self._camera.iso = 200
         self._camera.awb_gains = awb_gains
         self._rawCapture = PiRGBArray(self._camera, size=resolution)
         self._stream = self._camera.capture_continuous(self._rawCapture,
