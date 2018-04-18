@@ -8,6 +8,7 @@ from math import pi
 motor_vel_smoothing_factors = (0.01, 0.9, 0.9)
 ball_speed_smoothing_factors = (20.0, 0.9, 0.9)
 ball_heading_smoothing_factors = (20.0, 0.9, 0.9)
+robot_speed_smoothing_factors = (0.01, 0.9, 0.9)
 
 # ----- camera stuff -----
 pink = ((158, 114, 19), (170, 255, 236))

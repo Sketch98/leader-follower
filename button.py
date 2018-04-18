@@ -1,10 +1,7 @@
 import pigpio
 
 from parameters import button_debounce_delay
-
-
-class ButtonPushedException(Exception):
-    pass
+from globals import raspi
 
 
 class Button:
@@ -12,8 +9,7 @@ class Button:
     Waits for a button to be pressed
     """
     
-    def __init__(self, pin, active_low=True):
-        global raspi
+    def __init__(self, pin, callback, active_low=True):
         raspi.set_mode(pin, pigpio.INPUT)
         if active_low:
             raspi.set_pull_up_down(pin, pigpio.PUD_UP)
@@ -23,14 +19,14 @@ class Button:
             self._cb = raspi.callback(pin, pigpio.RISING_EDGE, self._press)
         
         self._last_time = 0.0
+        self.callback = callback
     
     def _press(self, gpio, level, tick):
         # convert ns to s
         time = tick/1000000.0
         if time - self._last_time >= button_debounce_delay:
             self._last_time = time
-            print('somebody pushed the button')
-            # raise ButtonPushedException
+            self.callback()
     
     def stop(self):
         self._cb.cancel()
@@ -39,15 +35,15 @@ class Button:
 if __name__ == '__main__':
     from time import sleep
     
-    raspi = pigpio.pi()
-    btn = Button(22)
-    while True:
-        try:
-            while True:
-                sleep(10)
-        except ButtonPushedException:
-            print('somebody pushed the button')
-        except KeyboardInterrupt:
-            break
-    btn.stop()
-    raspi.stop()
+    def callback():
+        print('somebody pressed the button')
+    
+    btn = Button(22, callback)
+    try:
+        while True:
+            sleep(10)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        btn.stop()
+        raspi.stop()

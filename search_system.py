@@ -14,7 +14,7 @@ class SearchMode(Enum):
 
 
 target_angle = {
-    SearchMode.left: -pi/2,
+    SearchMode.left: -pi*2/3,
     SearchMode.right: pi/2,
     SearchMode.center: 0,
     SearchMode.spin: 0
@@ -77,7 +77,7 @@ class SearchSystem:
             return True
         return False
     
-    def search_servo(self, servo_angle):
+    def servo(self, servo_angle):
         if self._mode == SearchMode.left:
             # check if reached destination
             if self.reached_target_angle(servo_angle):
@@ -85,7 +85,7 @@ class SearchSystem:
                 # switch to center if reached num_sweeps
                 if self._num_sweeps >= sweeps_before_spin:
                     self._mode = SearchMode.center
-                return self.search_servo(servo_angle)
+                return self.servo(servo_angle)
             # sweep left (negative)
             return -sweep_speed
         
@@ -96,14 +96,14 @@ class SearchSystem:
                 # switch to center if reached num_sweeps
                 if self._num_sweeps >= sweeps_before_spin:
                     self._mode = SearchMode.center
-                return self.search_servo(servo_angle)
+                return self.servo(servo_angle)
             # sweep right (positive)
             return sweep_speed
         
         elif self._mode == SearchMode.center:
             if self.reached_target_angle(servo_angle):
                 self._mode = SearchMode.spin
-                return self.search_servo(servo_angle)
+                return self.servo(servo_angle)
             # move servo to center (assume center is at 0 radians)
             return -servo_angle
         
@@ -111,12 +111,20 @@ class SearchSystem:
             # keep servo in center then spin robot
             return -servo_angle
     
-    def search_angular_speed(self):
-        if self._mode == SearchMode.left:
+    def forward_speed(self, f):
+        if self._mode == SearchMode.center or self._mode == SearchMode.spin:
             return 0.0
-        elif self._mode == SearchMode.right:
-            return 0.0
-        elif self._mode == SearchMode.center:
-            return 0.0
-        elif self._mode == SearchMode.spin:
+        return f
+    
+    def angular_speed(self, s):
+        if self._mode == SearchMode.spin:
             return spin_speed
+        return s
+    
+    def reset(self):
+        self._count = 0
+        self._search_count = 0
+        self._searching = False
+        self._mode = SearchMode.left
+        self._last_seen_angle = 0
+        self._num_sweeps = 0

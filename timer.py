@@ -15,3 +15,6 @@ class Timer:
             return None
         self.t += dif
         return dif
+    
+    def reset(self):
+        self.t = time()

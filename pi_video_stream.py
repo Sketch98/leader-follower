@@ -7,8 +7,6 @@ from parameters import camera_dist_offset, min_obj_radius, resolution, awb_gains
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 
-from timer import Timer
-
 
 def angle_to_pixel(x_pix):
     # corrects for camera's lens projecting curved light onto a flat sensor
@@ -33,7 +31,7 @@ def dist_angle_to_ball(x, diameter):
 
 
 class PiVideoStream:
-    def __init__(self, callback):
+    def __init__(self, callback, display=False):
         # initialize the camera and stream
         self._camera = PiCamera()
         self._camera.resolution = resolution
@@ -45,12 +43,10 @@ class PiVideoStream:
         self._stream = self._camera.capture_continuous(self._rawCapture,
                                                        format='bgr', use_video_port=True)
         
-        # initialize the variable used to indicate if the thread should be stopped
         self._stopped = False
-        
         self.pink = pink
         self.callback = callback
-        self.timer = Timer()
+        self._display = display
     
     def set_iso(self, iso):
         self._camera.iso = iso
@@ -64,14 +60,14 @@ class PiVideoStream:
         
         # construct a mask for the color pink
         mask = cv2.inRange(hsv, self.pink[0], self.pink[1])
-        # mask = cv2.erode(mask, None, iterations=2)
-        # mask = cv2.dilate(mask, None, iterations=2)
+        # mask = cv2.erode(mask, None, iterations=1)
+        # mask = cv2.dilate(mask, None, iterations=1)
         
         # find contours in the mask
         contours = \
             cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[
                 -2]
-
+        
         x, diameter = None, None
         # only proceed if at least one contour was found
         if len(contours) > 0:
@@ -85,35 +81,37 @@ class PiVideoStream:
                 x = x_pix
                 diameter = radius*2
         
-        # cv2.imshow('frame', frame)
-        # cv2.imshow('hsv', hsv)
-        # cv2.imshow('mask', mask)
-        # cv2.waitKey(1) & 0xFF
+        if self._display:
+            cv2.imshow('frame', frame)
+            cv2.imshow('hsv', hsv)
+            cv2.imshow('mask', mask)
+            cv2.waitKey(1) & 0xFF
         
         return x, diameter
     
-    def _grab_frame(self):
+    def _target(self):
         # keep looping infinitely until the thread is stopped
         for f in self._stream:
-            # grab the frame from the stream and clear the stream in
-            # preparation for the next frame
-            frame = f.array
-            self._rawCapture.truncate(0)
-            
             # if the thread indicator variable is set, stop the thread
-            # and resource camera resources
+            # and camera resources
             if self._stopped:
                 self._stream.close()
                 self._rawCapture.close()
                 self._camera.close()
                 return
+            
+            # grab the frame from the stream and clear the stream in
+            # preparation for the next frame
+            frame = f.array
+            self._rawCapture.truncate(0)
+            # process the image and send it out
             x, diameter = self.analyze_frame(frame)
             dist, angle = dist_angle_to_ball(x, diameter)
             self.callback(dist, angle)
     
     def start(self):
         # start the thread to read frames from the video stream
-        t = Thread(target=self._grab_frame)
+        t = Thread(target=self._target)
         t.daemon = True
         t.start()
         sleep(2)

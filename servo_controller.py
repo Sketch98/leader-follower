@@ -18,10 +18,10 @@ class ServoController:
         self.angle = 0.0
         
         # servo cannot be set faster than 50Hz, so 20ms lower_limit
-        self.timer = Timer(0.02)
+        self._timer = Timer(0.02)
     
     def move_by(self, offset):
-        time_elapsed = self.timer.elapsed()
+        time_elapsed = self._timer.elapsed()
         if time_elapsed is None:
             return
         
@@ -41,11 +41,12 @@ class ServoController:
         return (angle - self._left_limit)/(self._right_limit - self._left_limit)
     
     def start(self):
-        self.timer.start()
+        self._timer.start()
     
     def stop(self):
         self._move_to(0)
         self._pid.reset()
+        self._timer.reset()
 
 
 if __name__ == "__main__":

@@ -25,9 +25,10 @@ class MotorController:
         self._vel = self._vel_filter.filter(dist_traveled/time_elapsed, time_elapsed)
         return dist_traveled
     
-    def brake(self):
+    def reset(self):
         self._motor.set_speed(0)
         self._pid.reset()
+        self._encoder.reset()
     
     def stop(self):
         self._motor.stop()

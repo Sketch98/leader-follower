@@ -1,98 +1,125 @@
 from globals import raspi
 from nav_system import NavSystem
-from vision2 import Vision, update_pink
-from threading import Thread
 from parameters import pink as default_pink
+from parameters import awb_gains as default_awb_gains
+from pi_video_stream import PiVideoStream
 
 from matplotlib.widgets import Slider
 import matplotlib.pyplot as plt
+
+
+nav_system = NavSystem()
+
+
+def pvs_callback(dist, camera_to_ball_angle):
+    nav_system.update_ball_pos(dist, camera_to_ball_angle)
+
+
+pvs = PiVideoStream(pvs_callback, display=True)
 
 a_min = 0
 a_max = 255
 a_init = 0
 
-slider_a = plt.axes([0.1, 0.05, 0.8, 0.05])
-slider_b = plt.axes([0.1, 0.15, 0.8, 0.05])
-slider_c = plt.axes([0.1, 0.25, 0.8, 0.05])
-slider_d = plt.axes([0.1, 0.35, 0.8, 0.05])
-slider_e = plt.axes([0.1, 0.45, 0.8, 0.05])
-slider_f = plt.axes([0.1, 0.55, 0.8, 0.05])
+slider_h0 = plt.axes([0.1, 0.55, 0.8, 0.05])
+slider_h1 = plt.axes([0.1, 0.45, 0.8, 0.05])
+slider_s0 = plt.axes([0.1, 0.35, 0.8, 0.05])
+slider_s1 = plt.axes([0.1, 0.25, 0.8, 0.05])
+slider_v0 = plt.axes([0.1, 0.15, 0.8, 0.05])
+slider_v1 = plt.axes([0.1, 0.05, 0.8, 0.05])
 
-a_slider = Slider(slider_a, 'a', a_min, a_max, valinit=default_pink[0][0])
-b_slider = Slider(slider_b, 'b', a_min, a_max, valinit=default_pink[1][0])
-c_slider = Slider(slider_c, 'c', a_min, a_max, valinit=default_pink[0][1])
-d_slider = Slider(slider_d, 'd', a_min, a_max, valinit=default_pink[1][1])
-e_slider = Slider(slider_e, 'e', a_min, a_max, valinit=default_pink[0][2])
-f_slider = Slider(slider_f, 'f', a_min, a_max, valinit=default_pink[1][2])
+h0_slider = Slider(slider_h0, 'h0', a_min, a_max, valinit=default_pink[0][0])
+h1_slider = Slider(slider_h1, 'h1', a_min, a_max, valinit=default_pink[1][0])
+s0_slider = Slider(slider_s0, 's0', a_min, a_max, valinit=default_pink[0][1])
+s1_slider = Slider(slider_s1, 's1', a_min, a_max, valinit=default_pink[1][1])
+v0_slider = Slider(slider_v0, 'v0', a_min, a_max, valinit=default_pink[0][2])
+v1_slider = Slider(slider_v1, 'v1', a_min, a_max, valinit=default_pink[1][2])
 
-a, c, e = default_pink[0]
-b, d, f = default_pink[1]
-
-
-def update_ha(h):
-    global a
-    a = int(h)
-    update_pink((min(a, b), min(c, d), min(e, f)), (max(a, b), max(c, d), max(e, f)))
+h0, s0, v0 = default_pink[0]
+h1, s1, v1 = default_pink[1]
 
 
-def update_hb(h):
-    global b
-    b = int(h)
-    update_pink((min(a, b), min(c, d), min(e, f)), (max(a, b), max(c, d), max(e, f)))
+def update_h0(h):
+    global h0
+    h0 = int(h)
+    pvs.pink = ((min(h0, h1), min(s0, s1), min(v0, v1)), (max(h0, h1), max(s0, s1), max(v0, v1)))
 
 
-def update_sc(s):
-    global c
-    c = int(s)
-    update_pink((min(a, b), min(c, d), min(e, f)), (max(a, b), max(c, d), max(e, f)))
+def update_h1(h):
+    global h1
+    h1 = int(h)
+    pvs.pink = ((min(h0, h1), min(s0, s1), min(v0, v1)), (max(h0, h1), max(s0, s1), max(v0, v1)))
 
 
-def update_sd(s):
-    global d
-    d = int(s)
-    update_pink((min(a, b), min(c, d), min(e, f)), (max(a, b), max(c, d), max(e, f)))
+def update_s0(s):
+    global s0
+    s0 = int(s)
+    pvs.pink = ((min(h0, h1), min(s0, s1), min(v0, v1)), (max(h0, h1), max(s0, s1), max(v0, v1)))
 
 
-def update_ve(v):
-    global e
-    e = int(v)
-    update_pink((min(a, b), min(c, d), min(e, f)), (max(a, b), max(c, d), max(e, f)))
+def update_s1(s):
+    global s1
+    s1 = int(s)
+    pvs.pink = ((min(h0, h1), min(s0, s1), min(v0, v1)), (max(h0, h1), max(s0, s1), max(v0, v1)))
 
 
-def update_vf(v):
-    global f
-    f = int(v)
-    update_pink((min(a, b), min(c, d), min(e, f)), (max(a, b), max(c, d), max(e, f)))
+def update_v0(v):
+    global v0
+    v0 = int(v)
+    pvs.pink = ((min(h0, h1), min(s0, s1), min(v0, v1)), (max(h0, h1), max(s0, s1), max(v0, v1)))
 
 
-a_slider.on_changed(update_ha)
-b_slider.on_changed(update_hb)
-c_slider.on_changed(update_sc)
-d_slider.on_changed(update_sd)
-e_slider.on_changed(update_ve)
-f_slider.on_changed(update_vf)
+def update_v1(v):
+    global v1
+    v1 = int(v)
+    pvs.pink = ((min(h0, h1), min(s0, s1), min(v0, v1)), (max(h0, h1), max(s0, s1), max(v0, v1)))
 
 
-def target():
-    vision = Vision()
-    nav_system = NavSystem()
-    try:
-        nav_system.start()
-        vision.start()
-        while True:
-            dist, camera_to_ball_angle = vision.dist_angle_to_ball()
-            nav_system.update_ball_pos(dist, camera_to_ball_angle)
-    
-    except KeyboardInterrupt:
-        pass
-    finally:
-        nav_system.stop()
-        vision.stop()
-        raspi.stop()
+h0_slider.on_changed(update_h0)
+h1_slider.on_changed(update_h1)
+s0_slider.on_changed(update_s0)
+s1_slider.on_changed(update_s1)
+v0_slider.on_changed(update_v0)
+v1_slider.on_changed(update_v1)
 
 
-thread = Thread(target=target)
-thread.daemon = True
-thread.start()
-print('ayyyyyy lmao')
+slider_rg = plt.axes([0.1, 0.85, 0.8, 0.05])
+slider_bg = plt.axes([0.1, 0.75, 0.8, 0.05])
+slider_iso = plt.axes([0.1, 0.65, 0.8, 0.05])
+
+rg_slider = Slider(slider_rg, 'rg', 0.0, 3.0, valinit=default_awb_gains[0])
+bg_slider = Slider(slider_bg, 'bg', 0.0, 3.0, valinit=default_awb_gains[1])
+iso_slider = Slider(slider_iso, 'iso', 0, 900, valinit=200)
+
+rg, bg = default_awb_gains
+
+
+def update_rg(a):
+    global rg
+    rg = a
+    pvs.set_awb_gains((rg, bg))
+
+
+def update_bg(a):
+    global bg
+    bg = a
+    pvs.set_awb_gains((rg, bg))
+
+
+def update_iso(iso):
+    pvs.set_iso(iso)
+
+
+rg_slider.on_changed(update_rg)
+bg_slider.on_changed(update_bg)
+iso_slider.on_changed(update_iso)
+
+
+nav_system.start()
+pvs.start()
+
 plt.show()
+
+pvs.stop()
+nav_system.stop()
+raspi.stop()

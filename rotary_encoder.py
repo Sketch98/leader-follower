@@ -54,6 +54,10 @@ class RotaryEncoder:
         self._last_pos += pos_dif
         return pos_dif
     
+    def reset(self):
+        self._last_pos = 0
+        self.pos = 0
+    
     def stop(self):
         # Cancel the rotary encoder callback
         self._cb_a.cancel()

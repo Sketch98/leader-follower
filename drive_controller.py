@@ -3,8 +3,9 @@ from math import pi
 from globals import correct_angle
 from motor_controller import MotorController
 from parameters import distance_between_wheels, left_motor_pid_constants, \
-    left_pins, right_motor_pid_constants, right_pins, small_angle
+    left_pins, right_motor_pid_constants, right_pins, small_angle, robot_speed_smoothing_factors
 from position import ZERO_POS
+from filter import IrregularDoubleExponentialFilter
 
 
 def forward_kin(left, right):
@@ -31,9 +32,11 @@ class DriveController:
         self._right_motor_controller = MotorController(1, right_pins,
                                                        right_motor_pid_constants,
                                                        1)
+        self._speed_filter = IrregularDoubleExponentialFilter(*robot_speed_smoothing_factors)
         
         self.pos_heading = (ZERO_POS, 0.0)
         self.robot_angle = 0.0
+        self.robot_speed = 0.0
     
     def read_encoders(self, time_elapsed):
         """Reads the encoders and updates the robot's position, heading,
@@ -46,10 +49,11 @@ class DriveController:
             time_elapsed)
         
         dist, angle = forward_kin(left_dist_traveled, right_dist_traveled)
-        
         # dead reckon pos and angle
         self.robot_angle = correct_angle(self.robot_angle + angle)
-        # self.dead_reckon(dist, angle)
+        self.dead_reckon(dist, angle)
+        
+        self.robot_speed = self._speed_filter.filter(dist/time_elapsed, time_elapsed)
     
     def dead_reckon(self, dist, angle):
         if abs(angle) <= small_angle:
@@ -71,9 +75,12 @@ class DriveController:
         self._left_motor_controller.current_sensor.check_current()
         self._right_motor_controller.current_sensor.check_current()
     
-    def brake(self):
-        self._left_motor_controller.brake()
-        self._left_motor_controller.brake()
+    def reset(self):
+        self._left_motor_controller.reset()
+        self._left_motor_controller.reset()
+        self.pos_heading = (ZERO_POS, 0.0)
+        self.robot_angle = 0.0
+        self.robot_speed = 0.0
     
     def stop(self):
         self._left_motor_controller.stop()
@@ -84,13 +91,13 @@ if __name__ == '__main__':
     from globals import raspi
     from time import sleep
     
-    d = DriveController()
+    s1 = DriveController()
     interval = 0.01
     try:
         while True:
-            d.read_encoders(interval)
-            d.update_motors(1000, 0.25, interval)
+            s1.read_encoders(interval)
+            s1.update_motors(1000, 0.25, interval)
             sleep(interval)
     except KeyboardInterrupt:
-        d.stop()
+        s1.stop()
         raspi.stop()

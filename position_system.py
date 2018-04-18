@@ -36,3 +36,6 @@ class PositionSystem:
                                                                    angle_to_ball -
                                                                    ball_heading)
         return rel_robot_pos_from_ball_pov, ball_heading, ball_speed
+    
+    def reset(self):
+        self.last_ball_loc = ZERO_POS
