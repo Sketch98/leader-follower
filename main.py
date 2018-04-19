@@ -31,7 +31,7 @@ try:
             cond.wait()
         print('WHY DID YOU PRESS THE BUTTON!')
         nav_system.pause()
-        sleep(2)
+        sleep(15)
         nav_system.resume()
 except KeyboardInterrupt:
     print("somebody ctrl+c'd me :^(")

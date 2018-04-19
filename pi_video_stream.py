@@ -36,9 +36,9 @@ class PiVideoStream:
         self._camera = PiCamera()
         self._camera.resolution = resolution
         self._camera.framerate = 42.1
-        self._camera.awb_mode = 'off'
-        self._camera.awb_gains = awb_gains
-        self._camera.iso = 200
+        # self._camera.awb_mode = 'off'
+        # self._camera.awb_gains = awb_gains
+        # self._camera.iso = 600
         self._rawCapture = PiRGBArray(self._camera, size=resolution)
         self._stream = self._camera.capture_continuous(self._rawCapture,
                                                        format='bgr', use_video_port=True)
@@ -60,8 +60,8 @@ class PiVideoStream:
         
         # construct a mask for the color pink
         mask = cv2.inRange(hsv, self.pink[0], self.pink[1])
-        # mask = cv2.erode(mask, None, iterations=1)
-        # mask = cv2.dilate(mask, None, iterations=1)
+        mask = cv2.erode(mask, None, iterations=1)
+        mask = cv2.dilate(mask, None, iterations=1)
         
         # find contours in the mask
         contours = \

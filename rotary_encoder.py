@@ -43,7 +43,7 @@ class RotaryEncoder:
             else:
                 self.pos -= 1
         elif gpio == self._b:
-            self._lev_b = level
+	    self._lev_b = level
             if level == self._lev_a:
                 self.pos -= 1
             else:

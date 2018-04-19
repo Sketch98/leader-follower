@@ -79,16 +79,16 @@ class NavSystem:
         elif abs(angle_error) > pi/12:
             dist_error *= 0.9
         
-        if abs(speed) > 1000:
-            angle_error *= 0.1
-        elif abs(speed) > 800:
-            angle_error *= 0.2
-        elif abs(speed) > 600:
+        if abs(speed) > 2000:
             angle_error *= 0.3
-        elif abs(speed) > 400:
+        elif abs(speed) > 1500:
+            angle_error *= 0.5
+        elif abs(speed) > 1000:
             angle_error *= 0.6
-        elif abs(speed) > 200:
-            angle_error *= 0.8
+        elif abs(speed) > 800:
+            angle_error *= 0.75
+        elif abs(speed) > 600:
+            angle_error *= 0.9
         
         forward_vel = self._forward_pid.calc(dist_error, time_elapsed)
         angular_vel = self._turn_pid.calc(angle_error, time_elapsed)

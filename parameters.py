@@ -11,10 +11,10 @@ ball_heading_smoothing_factors = (20.0, 0.9, 0.9)
 robot_speed_smoothing_factors = (0.01, 0.9, 0.9)
 
 # ----- camera stuff -----
-pink = ((158, 114, 19), (170, 255, 236))
-awb_gains = (1.0, 1.8)
-resolution = (320, 240)
-min_obj_radius = 8
+pink = ((158, 85, 78), (168, 246, 255))
+awb_gains = (1.11, 0.96)
+resolution = (640, 480)
+min_obj_radius = 6
 
 # ----- pids -----
 servo_pid_constants = {
@@ -36,15 +36,14 @@ right_motor_pid_constants = {
     # 'dead_band': 0.005
 }
 forward_pid_constants = {
-    'kp': 0.2,
-    'ki': 1.5,
-    'kd': 0.04,
-    'dead_band': 25
+    'kp': 2.0,
+    'ki': 0.75,
+    'kd': 0.03
 }
 angle_pid_constants = {
-    'kp': 0.5,
+    'kp': 1.0,
     'ki': 0,
-    'kd': 0.05,
+    'kd': 0.01,
     'dead_band': pi/36
 }
 # ----- navigation -----
@@ -58,9 +57,9 @@ small_angle = pi/36
 # the period the navigation system is run at
 nav_timer_interval = 0.01
 # maximum forward speed
-max_forward_speed = 500
+max_forward_speed = 1500
 # maximum angular speed
-max_angular_speed = 2
+max_angular_speed = 3
 
 # ----- search system -----
 # number of frames with the ball missing before searching starts
@@ -91,7 +90,7 @@ button_pin = 22
 # pwm and dir for motor controller
 # a and b for rotary encoder quadrature input
 left_pins = {'pwm': 6, 'dir': 5, 'a': 17, 'b': 27}
-right_pins = {'pwm': 26, 'dir': 13, 'a': 23, 'b': 18}
+right_pins = {'pwm': 26, 'dir': 13, 'a': 24, 'b': 23}
 
 # ----- servo controller -----
 # speed of servo in radians per second

@@ -1,6 +1,6 @@
 import pigpio
 
-from globals import raspi
+from globals import raspi, limit
 from parameters import motor_pwm_range
 
 
@@ -21,7 +21,7 @@ class Motor:
         raspi.write(self._dir_pin, direction)
     
     def _set_pwm(self, pwm):
-        pwm = pwm
+        pwm = limit(pwm, -10000, 10000)
         assert motor_pwm_range >= pwm >= 0, 'invalid pwm = {} in ' \
                                             '_set_pwm'.format(
             pwm)

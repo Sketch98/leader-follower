@@ -47,11 +47,10 @@ class DriveController:
             time_elapsed)
         right_dist_traveled = self._right_motor_controller.read_encoder(
             time_elapsed)
-        
         dist, angle = forward_kin(left_dist_traveled, right_dist_traveled)
         # dead reckon pos and angle
         self.robot_angle = correct_angle(self.robot_angle + angle)
-        self.dead_reckon(dist, angle)
+        # self.dead_reckon(dist, angle)
         
         self.robot_speed = self._speed_filter.filter(dist/time_elapsed, time_elapsed)
     
@@ -77,7 +76,7 @@ class DriveController:
     
     def reset(self):
         self._left_motor_controller.reset()
-        self._left_motor_controller.reset()
+        self._right_motor_controller.reset()
         self.pos_heading = (ZERO_POS, 0.0)
         self.robot_angle = 0.0
         self.robot_speed = 0.0
