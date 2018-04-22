@@ -1,5 +1,5 @@
 from filter import IrregularDoubleExponentialFilter
-from parameters import camera_y_offset, ball_speed_smoothing_factors, ball_heading_smoothing_factors
+from parameters import ball_speed_smoothing_factors, ball_heading_smoothing_factors
 from position import Position, ZERO_POS
 
 
@@ -14,8 +14,6 @@ class PositionSystem:
                            time_elapsed):
         # calculate xy dif from vehicle
         rel_ball_pos_from_robot_pov = ZERO_POS.pos_from_dist_angle(dist_to_ball, angle_to_ball)
-        rel_ball_pos_from_robot_pov = rel_ball_pos_from_robot_pov.pos_from_xy_dif(
-            Position(0, camera_y_offset))
         
         # rotate rel xy offset then add to vehicle_pos to find the ball's
         # absolute position

@@ -43,7 +43,7 @@ class RotaryEncoder:
             else:
                 self.pos -= 1
         elif gpio == self._b:
-	    self._lev_b = level
+            self._lev_b = level
             if level == self._lev_a:
                 self.pos -= 1
             else:
@@ -55,8 +55,7 @@ class RotaryEncoder:
         return pos_dif
     
     def reset(self):
-        self._last_pos = 0
-        self.pos = 0
+        self._last_pos = self.pos
     
     def stop(self):
         # Cancel the rotary encoder callback

@@ -20,12 +20,13 @@ class Servo:
 
 
 if __name__ == "__main__":
-    import time
+    from time import sleep
+    from parameters import servo_pin
     
-    servo = Servo(25)
-    time.sleep(2)
+    servo = Servo(servo_pin)
+    sleep(2)
     for angle in range(51):
         servo.move_to(angle/50.0)
-        time.sleep(0.05)
+        sleep(0.05)
     
     raspi.stop()
