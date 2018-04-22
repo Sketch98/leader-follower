@@ -7,7 +7,6 @@ from parameters import angle_pid_constants, forward_pid_constants, \
     servo_pid_constants, \
     servo_pin, target_ball_dist
 from pid import PID
-from position_system import PositionSystem
 from repeated_timer import RepeatedTimer
 from search_system import SearchSystem
 from servo_controller import ServoController
@@ -15,12 +14,21 @@ from timer import Timer
 
 
 class NavSystem:
-    # TODO: implement updating distance and pos with dead reckoning
-    # TODO: add searching when ball not seen
+    """Steers a point model of the robot by setting a forward and angular velocity
+    
+    This class also controls the servo at a fast speed so that it can compensate
+    for any amount the robot turns by turning in the opposite direction.
+    Ideally this will keep the servo pointing in the same direction at all
+    times. This is obviously not possible because the motors are stronger than
+    the servo and the servo is reacting to the motors' movements.
+    
+    This is accomplished by having an absolute plane. The robot starts at zero
+    degrees and tracks its angle relative to this plane when it reads the
+    encoders. The servo can also find the absolute angle its pointing at by
+    adding the angle relative to the vehicle to the vehicle's absolute angle."""
     def __init__(self):
         self._drive_controller = DriveController()
         self._search_system = SearchSystem()
-        self._position_system = PositionSystem()
         self._camera_timer = Timer()
         self.servo_controller = ServoController(servo_pin, servo_pid_constants)
         self._repeated_timer = RepeatedTimer(nav_timer_interval,
@@ -30,8 +38,6 @@ class NavSystem:
         self._turn_pid = PID(angle_pid_constants)
         self._dist_to_ball = target_ball_dist
         self._abs_ball_angle = 0.0
-        self._ball_speed = 0.0
-        self._ball_heading = 0.0
         self._paused = False
         self._searching = False
     
@@ -40,13 +46,16 @@ class NavSystem:
             self.reset()
             return
         
-        # get dist and angle since last callback
+        # read the encoders so the drive system can update the vehicle's
+        # absolute angle, then adjust servo to account for the vehicle's
+        # rotation
         self._drive_controller.read_encoders(time_elapsed)
         self.adjust_servo()
         
         # calculate wanted forward and angular speed
         forward_vel, angular_vel = self.calc_velocities(time_elapsed)
         
+        # search system can override the velocities if needed
         if self._searching:
             forward_vel = self._search_system.forward_speed(forward_vel)
             angular_vel = self._search_system.angular_speed(angular_vel)
@@ -56,10 +65,11 @@ class NavSystem:
     
     def adjust_servo(self):
         if self._searching:
+            # searching system has its own uses for the servo
             angle_error = self._search_system.servo(self.servo_controller.angle)
         else:
             # adjust servo to account for robot's spin
-            angle_error = self._abs_ball_angle - self.abs_servo_angle()
+            angle_error = self._abs_ball_angle - self._abs_servo_angle()
             angle_error = correct_angle(angle_error)
         self.servo_controller.move_by(angle_error)
     
@@ -68,6 +78,9 @@ class NavSystem:
         dist_error = self._dist_to_ball - target_ball_dist
         angle_error = self._abs_ball_angle - self._drive_controller.robot_angle
         angle_error = correct_angle(angle_error)
+        
+        # slow the forward speed when there is a large angle from the robot
+        # to the ball
         if abs(angle_error) > pi*5/12:
             dist_error *= 0
         elif abs(angle_error) > pi/3:
@@ -79,16 +92,18 @@ class NavSystem:
         elif abs(angle_error) > pi/12:
             dist_error *= 0.9
         
+        # slow the turning when the robot is traveling at fast speed to
+        # prevent spin outs
         if abs(speed) > 2000:
-            angle_error *= 0.3
-        elif abs(speed) > 1500:
             angle_error *= 0.5
+        elif abs(speed) > 1500:
+            angle_error *= 0.7
         elif abs(speed) > 1000:
-            angle_error *= 0.6
+            angle_error *= 0.8
         elif abs(speed) > 800:
-            angle_error *= 0.75
-        elif abs(speed) > 600:
             angle_error *= 0.9
+        elif abs(speed) > 600:
+            angle_error *= 0.95
         
         forward_vel = self._forward_pid.calc(dist_error, time_elapsed)
         angular_vel = self._turn_pid.calc(angle_error, time_elapsed)
@@ -96,22 +111,25 @@ class NavSystem:
         angular_vel = symmetric_limit(angular_vel, max_angular_speed)
         return forward_vel, angular_vel
     
-    def abs_servo_angle(self):
+    def _abs_servo_angle(self):
+        # the absolute angle the servo is pointing to
         a = self.servo_controller.angle + self._drive_controller.robot_angle
         return correct_angle(a)
     
-    def slow_forward(self):
+    def _slow_forward(self):
+        # this method resets the forward pid so the robot slows to a stop
         self._dist_to_ball = target_ball_dist
+        self._forward_pid.reset()
     
     def update_ball_pos(self, dist, angle):
+        # if the ball is missing from this frame
         if dist is None:
             self._searching = self._search_system.in_search_mode(None)
-            self._ball_speed = 0
-            self.slow_forward()
+            self._slow_forward()
             return
         self._searching = False
         self._dist_to_ball = dist
-        self._abs_ball_angle = correct_angle(self.abs_servo_angle() + angle)
+        self._abs_ball_angle = correct_angle(self._abs_servo_angle() + angle)
         self._search_system.in_search_mode(self._abs_ball_angle)
     
     def pause(self):
@@ -129,19 +147,14 @@ class NavSystem:
         self._repeated_timer.stop()
         self._drive_controller.stop()
         self.servo_controller.stop()
-        self._forward_pid.reset()
-        self._turn_pid.reset()
     
     def reset(self):
         self._forward_pid.reset()
         self._turn_pid.reset()
         self._dist_to_ball = target_ball_dist
         self._abs_ball_angle = 0.0
-        self._ball_speed = 0.0
-        self._ball_heading = 0.0
         self.servo_controller.stop()
         self._drive_controller.reset()
-        self._position_system.reset()
         self._search_system.reset()
 
 

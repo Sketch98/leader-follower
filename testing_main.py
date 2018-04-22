@@ -17,10 +17,7 @@ def pvs_callback(dist, camera_to_ball_angle):
 
 pvs = PiVideoStream(pvs_callback, display=True)
 
-a_min = 0
-a_max = 255
-a_init = 0
-
+# the hsv sliders dynamically set the hsv window in pi_video_stream
 slider_h0 = plt.axes([0.1, 0.55, 0.8, 0.05])
 slider_h1 = plt.axes([0.1, 0.45, 0.8, 0.05])
 slider_s0 = plt.axes([0.1, 0.35, 0.8, 0.05])
@@ -28,12 +25,12 @@ slider_s1 = plt.axes([0.1, 0.25, 0.8, 0.05])
 slider_v0 = plt.axes([0.1, 0.15, 0.8, 0.05])
 slider_v1 = plt.axes([0.1, 0.05, 0.8, 0.05])
 
-h0_slider = Slider(slider_h0, 'h0', a_min, a_max, valinit=default_pink[0][0])
-h1_slider = Slider(slider_h1, 'h1', a_min, a_max, valinit=default_pink[1][0])
-s0_slider = Slider(slider_s0, 's0', a_min, a_max, valinit=default_pink[0][1])
-s1_slider = Slider(slider_s1, 's1', a_min, a_max, valinit=default_pink[1][1])
-v0_slider = Slider(slider_v0, 'v0', a_min, a_max, valinit=default_pink[0][2])
-v1_slider = Slider(slider_v1, 'v1', a_min, a_max, valinit=default_pink[1][2])
+h0_slider = Slider(slider_h0, 'h0', 0, 255, valinit=default_pink[0][0])
+h1_slider = Slider(slider_h1, 'h1', 0, 255, valinit=default_pink[1][0])
+s0_slider = Slider(slider_s0, 's0', 0, 255, valinit=default_pink[0][1])
+s1_slider = Slider(slider_s1, 's1', 0, 255, valinit=default_pink[1][1])
+v0_slider = Slider(slider_v0, 'v0', 0, 255, valinit=default_pink[0][2])
+v1_slider = Slider(slider_v1, 'v1', 0, 255, valinit=default_pink[1][2])
 
 h0, s0, v0 = default_pink[0]
 h1, s1, v1 = default_pink[1]
@@ -83,6 +80,7 @@ v0_slider.on_changed(update_v0)
 v1_slider.on_changed(update_v1)
 
 
+# the rg, bg, and iso dynamically reconfigure the camera's settings
 slider_rg = plt.axes([0.1, 0.85, 0.8, 0.05])
 slider_bg = plt.axes([0.1, 0.75, 0.8, 0.05])
 slider_iso = plt.axes([0.1, 0.65, 0.8, 0.05])

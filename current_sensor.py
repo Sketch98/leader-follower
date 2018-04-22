@@ -7,6 +7,12 @@ class CurrentException(Exception):
 
 
 class CurrentSensor:
+    """This class is supposed to interface with the MCP3008 ADC to measure the
+    current the motors are pulling but all tests with this code yielded weird
+    results such as the exception being raised immediately even when the motors
+    aren't connected.
+    
+    For this reason the condition passes instead of raising the exception."""
     def __init__(self, mcp_channel):
         self._mcp_channel = mcp_channel
         self._count = 0
@@ -22,4 +28,3 @@ class CurrentSensor:
                 # raise CurrentException
         else:
             self._count -= 1
-        return current

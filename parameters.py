@@ -1,5 +1,13 @@
 from math import pi
 
+
+"""This is a file of every parameter and constant that can be modified to tune
+the robot's behavior. I know it's bad to shove all of this into one file, but
+it's appropriate when all of the tuning is done over a slow network connection
+when writing to one file is advantageous compared to re-sending the entire code
+base every time a parameter is tuned."""
+
+
 # all lengths in mm and angles in radians
 # --------------------------------------------------------------
 # --------------------- parameters -----------------------------
@@ -74,7 +82,7 @@ sweep_speed = 0.2
 spin_speed = 1.0
 # number of times the servo will sweep from one side to another before it
 # switches to the robot spinning
-sweeps_before_spin = 2
+sweeps_before_spin = 4
 
 # ----- miscellaneous -----
 # minimum time in between presses of a button

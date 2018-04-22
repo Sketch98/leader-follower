@@ -22,7 +22,8 @@ target_angle = {
 
 
 class SearchSystem:
-    
+    """Sweeps the servo back and forth then spins the robot so in the case the
+    ball goes missing for a long time the robot can try to find it again."""
     def __init__(self):
         self._count = 0
         self._search_count = 0
@@ -70,6 +71,7 @@ class SearchSystem:
         return self._searching
     
     def reached_target_angle(self, servo_angle):
+        # Checks if the servo is near enough to the target
         lower_bound = target_angle[self._mode] - acceptable_angle_error
         upper_bound = target_angle[self._mode] + acceptable_angle_error
         if lower_bound <= servo_angle <= upper_bound:
@@ -112,11 +114,13 @@ class SearchSystem:
             return -servo_angle
     
     def forward_speed(self, f):
+        # for overriding the forward speed of the robot
         if self._mode == SearchMode.center or self._mode == SearchMode.spin:
             return 0.0
         return f
     
     def angular_speed(self, s):
+        # for overriding the angular speed of the robot
         if self._mode == SearchMode.spin:
             return spin_speed
         return s

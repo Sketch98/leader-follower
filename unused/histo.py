@@ -1,6 +1,8 @@
 from matplotlib import pyplot
 from numpy import loadtxt, ravel
 
+# A simple script for generating histograms.
+
 v = loadtxt('b.csv', delimiter=",", dtype='float', comments="#", skiprows=0,
             usecols=None)
 v_hist = ravel(v)  # 'flatten' v

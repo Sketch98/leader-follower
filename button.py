@@ -24,6 +24,7 @@ class Button:
     def _press(self, gpio, level, tick):
         # convert ns to s
         time = tick/1000000.0
+        # debounce the button
         if time - self._last_time >= button_debounce_delay:
             self._last_time = time
             self.callback()

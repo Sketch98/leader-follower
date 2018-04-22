@@ -1,5 +1,3 @@
-from math import pi
-
 from globals import correct_angle
 from motor_controller import MotorController
 from parameters import distance_between_wheels, left_motor_pid_constants, \
@@ -22,8 +20,12 @@ def reverse_kin(forward, angle):
 
 class DriveController:
     """
-    tracks the robot's position via dead reckoning and handles the motor's
-    kinematics"""
+    Tracks the robot's position via dead reckoning and handles the motor's
+    kinematics.
+    
+    The robot uses skid steering which has simple forward and reverse
+    kinematics. DriveController is used to bridge the abstraction between a
+    point model of the robot and the robot's actual layout."""
     
     def __init__(self):
         self._left_motor_controller = MotorController(0, left_pins,
@@ -55,6 +57,18 @@ class DriveController:
         self.robot_speed = self._speed_filter.filter(dist/time_elapsed, time_elapsed)
     
     def dead_reckon(self, dist, angle):
+        """This method was tested in a previous version of the robot's software
+        and it tracked the position of the robot very well when the tires didn't
+        slip. Regrettably there wasn't enough time to integrate position system
+        with the navigation system, so keeping track of the robot's position
+        wouldn't yield any advantages.
+        
+        This method uses the point and shoot method. The point and shoot method
+        estimates movement as a turn followed by a movement forward. Obviously
+        the robot doesn't move like this but it is a good estimation when the
+        total turn is small. If the turn is too large (>small_angle), then the
+        movement is split into two consecutive point and shoots. This is done
+        recursively while the angle is too large."""
         if abs(angle) <= small_angle:
             pos = self.pos_heading[0].pos_from_dist_angle(dist, angle)
             theta = correct_angle(self.pos_heading[1] + angle)
@@ -64,6 +78,8 @@ class DriveController:
         self.dead_reckon(dist/2, angle/2)
     
     def update_motors(self, forward_vel, angular_vel, time_elapsed):
+        # Transform forward and angular to left and right and send to the
+        # motor controllers
         left_target, right_target = reverse_kin(forward_vel, angular_vel)
         self._left_motor_controller.adjust_motor_speed(left_target,
                                                        time_elapsed)
@@ -71,6 +87,7 @@ class DriveController:
                                                         time_elapsed)
     
     def check_current(self):
+        # the current sensor don't work so this is never called in this version
         self._left_motor_controller.current_sensor.check_current()
         self._right_motor_controller.current_sensor.check_current()
     
@@ -90,13 +107,13 @@ if __name__ == '__main__':
     from globals import raspi
     from time import sleep
     
-    s1 = DriveController()
+    d = DriveController()
     interval = 0.01
     try:
         while True:
-            s1.read_encoders(interval)
-            s1.update_motors(1000, 0.25, interval)
+            d.read_encoders(interval)
+            d.update_motors(1000, 0.25, interval)
             sleep(interval)
     except KeyboardInterrupt:
-        s1.stop()
+        d.stop()
         raspi.stop()

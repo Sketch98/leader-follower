@@ -1,9 +1,12 @@
 from filter import IrregularDoubleExponentialFilter
 from parameters import ball_speed_smoothing_factors, ball_heading_smoothing_factors
-from position import Position, ZERO_POS
+from position import ZERO_POS
 
 
 class PositionSystem:
+    """Was planned to be used for tracking the absolute position of the ball in
+    the navigation thread but I didn't have time to finish implementing the whole
+    system before the expo."""
     
     def __init__(self):
         self._speed_filter = IrregularDoubleExponentialFilter(*ball_speed_smoothing_factors)

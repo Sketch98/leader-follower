@@ -5,6 +5,8 @@ from parameters import motor_pwm_range
 
 
 class Motor:
+    """Interfaces with pigpio for a dir and pwm style motor controller.
+    dir controls forward or backwards and pwm controls the power to the motor"""
     def __init__(self, pwm_pin, dir_pin, forward):
         self._pwm_pin = pwm_pin
         self._dir_pin = dir_pin

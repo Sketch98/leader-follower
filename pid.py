@@ -1,4 +1,5 @@
 class PID:
+    """It's a pid controller implementation that can be reset."""
     def __init__(self, pid_constants):
         self._kp = pid_constants['kp']
         self._ki = pid_constants['ki']

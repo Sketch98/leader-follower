@@ -4,9 +4,8 @@ import pigpio
 
 class Servo:
     """
-    controls pigpio interface for a servo
+    controls the pigpio interface for a servo
     """
-    
     def __init__(self, pin):
         raspi.set_mode(pin, pigpio.OUTPUT)
         self.pin = pin

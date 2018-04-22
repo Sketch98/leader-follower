@@ -3,6 +3,10 @@ import time
 import Adafruit_GPIO.SPI as spi
 import Adafruit_MCP3008 as mcp3008
 
+
+"""Tests the MCP3008 ADC."""
+
+
 # Hardware SPI configuration:
 SPI_PORT = 0
 SPI_DEVICE = 0

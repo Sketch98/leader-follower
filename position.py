@@ -2,6 +2,7 @@ from math import atan2, cos, sin, sqrt
 
 
 class Position:
+    """A utility class for finding positions on an absolute plane."""
     def __init__(self, x, y):
         self.x = x
         self.y = y

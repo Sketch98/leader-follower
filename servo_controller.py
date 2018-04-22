@@ -8,6 +8,8 @@ from timer import Timer
 
 
 class ServoController:
+    """Handles the high-level tasks of controlling a servo. It keeps track of
+    the servo's angle and allows for relative movements."""
     def __init__(self, pin, pid_constants, left_limit=-pi*2/3, right_limit=pi/2):
         self._servo = Servo(pin)
         self._pid = PID(pid_constants)
@@ -35,9 +37,9 @@ class ServoController:
         # ensure servo doesn't move beyond limits
         angle = limit(angle, self._left_limit, self._right_limit)
         self.angle = angle
-        self._servo.move_to(self.angle_ratio(angle))
+        self._servo.move_to(self._angle_ratio(angle))
     
-    def angle_ratio(self, angle):
+    def _angle_ratio(self, angle):
         return (angle - self._left_limit)/(self._right_limit - self._left_limit)
     
     def start(self):

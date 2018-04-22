@@ -37,6 +37,9 @@ class WeightedFilter:
 
 
 class ExponentialFilter():
+    """A simple exponential filter:
+    s_n = alpha*val + (1-alpha)*s_n-1
+    more info on wikipedia"""
     def __init__(self, smoothing_factor):
         assert 0 < smoothing_factor < 1, 'smoothing factor must be in (0, ' \
                                           '1]. it is {}'.format(
@@ -56,6 +59,7 @@ class ExponentialFilter():
 
 
 class DoubleExponentialFilter():
+    """Based on the double exponential filter on wikipedia."""
     def __init__(self, smoothing_factor, trend_smoothing_factor):
         assert 0 < smoothing_factor < 1, 'smoothing factor must be in (0, ' \
                                           '1]. it is {}'.format(
@@ -91,6 +95,9 @@ class DoubleExponentialFilter():
 
 
 class IrregularExponentialFilter():
+    """Irregular Exponential Filter (info can be found in the paper titled
+    Algorithms for Unevenly Spaced Time Series - Moving Averages and Other
+    Rolling Operators by A. Eckner, https://eckner.com/papers/Algorithms%20for%20Unevenly%20Spaced%20Time%20Series.pdf)"""
     def __init__(self, normal_interval, smoothing_factor):
         assert 0 < smoothing_factor < 1, 'smoothing factor must be in (0, ' \
                                           '1]. it is {}'.format(
@@ -116,6 +123,14 @@ class IrregularExponentialFilter():
 
 
 class IrregularDoubleExponentialFilter():
+    """A special filter developed for use in this project. It combines the
+    features of the Double Exponential Filter (info can be found on wikipedia)
+    and the Irregular Exponential Filter (info can be found in the paper titled
+    Algorithms for Unevenly Spaced Time Series - Moving Averages and Other
+    Rolling Operators by A. Eckner, https://eckner.com/papers/Algorithms%20for%20Unevenly%20Spaced%20Time%20Series.pdf)
+    
+    I know I haven't written enough about it in the report so any questions
+    about it can be answered by the developer at sketchn98@gmail.com"""
     def __init__(self, normal_interval, smoothing_factor, trend_smoothing_factor):
         assert 0 < smoothing_factor < 1, 'smoothing factor must be in (0, ' \
                                           '1]. it is {}'.format(
